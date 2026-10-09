@@ -23,7 +23,11 @@ A comprehensive dashboard for managing and analyzing potentially fraudulent tran
 
 ### Server
 
-*(Instructions to run the Node.js server will go here)*
+1. Navigate to the `server/` directory: `cd server`
+2. Install dependencies: `npm install`
+3. Set up environment variables: copy `.env.example` to `.env` and adjust if needed: `cp .env.example .env`
+4. Run the development server: `npm run dev`
+5. The API will be available at `http://localhost:5001/api/health`
 
 ### Client
 
