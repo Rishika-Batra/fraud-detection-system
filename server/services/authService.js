@@ -16,7 +16,7 @@ const jwt = require('jsonwebtoken');
 const { User } = require('../models');
 const { logAction, ACTIONS } = require('./auditLogger');
 
-const JWT_SECRET = process.env.JWT_SECRET;
+const JWT_SECRET = process.env.JWT_SECRET || 'change_me';
 const JWT_EXPIRY = '8h'; // Token expires in 8 hours
 
 /**
