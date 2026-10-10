@@ -29,6 +29,8 @@ router.post('/login', async (req, res, next) => {
 // the server simply confirms logout. The client is responsible for discarding the token.
 // NOTE: Audit logging for login/logout will be added in the audit step.
 router.post('/logout', authenticate, (req, res) => {
+  const { logAction, ACTIONS } = require('../services/auditLogger');
+  logAction({ userId: req.user.id, action: ACTIONS.LOGOUT, entityType: 'User', entityId: req.user.id });
   return res.json({ message: 'Logged out' });
 });
 
@@ -45,7 +47,7 @@ router.get('/me', authenticate, (req, res) => {
 router.post('/users', authenticate, authorize('admin'), async (req, res, next) => {
   try {
     const { username, password, role } = req.body;
-    const user = await authService.createUser({ username, password, role });
+    const user = await authService.createUser({ username, password, role }, req.user.id);
     return res.status(201).json(user);
   } catch (error) {
     if (error.status) {

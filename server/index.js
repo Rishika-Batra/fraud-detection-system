@@ -34,6 +34,7 @@ app.use('/api/transactions', transactionRoutes);
 app.use('/api/cases', caseRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/reports', reportRoutes);
+app.use('/api/audit', require('./routes/audit'));
 
 // 404 Handler for unknown routes
 app.use((req, res, next) => {

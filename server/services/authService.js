@@ -14,6 +14,7 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { User } = require('../models');
+const { logAction, ACTIONS } = require('./auditLogger');
 
 const JWT_SECRET = process.env.JWT_SECRET;
 const JWT_EXPIRY = '8h'; // Token expires in 8 hours
@@ -49,6 +50,7 @@ async function login(username, password) {
 
   if (!user) {
     // User not found — return generic message (never reveal that the username doesn't exist)
+    await logAction({ userId: null, action: ACTIONS.LOGIN_FAILED, entityType: 'User', details: { username } });
     throw { status: 401, message: 'Invalid username or password' };
   }
 
@@ -57,6 +59,7 @@ async function login(username, password) {
 
   if (!isMatch) {
     // Wrong password — same generic message
+    await logAction({ userId: null, action: ACTIONS.LOGIN_FAILED, entityType: 'User', details: { username } });
     throw { status: 401, message: 'Invalid username or password' };
   }
 
@@ -66,7 +69,10 @@ async function login(username, password) {
   const tokenPayload = { id: user.id, username: user.username, role: user.role };
   const token = jwt.sign(tokenPayload, JWT_SECRET, { expiresIn: JWT_EXPIRY });
 
-  // 4. Return the token and a safe user object (never include password_hash)
+  // 4. Log the successful login
+  await logAction({ userId: user.id, action: ACTIONS.LOGIN_SUCCESS, entityType: 'User', entityId: user.id });
+
+  // 5. Return the token and a safe user object (never include password_hash)
   return {
     token,
     user: { id: user.id, username: user.username, role: user.role }
@@ -77,9 +83,10 @@ async function login(username, password) {
  * Creates a new user with validated input.
  *
  * @param {Object} data - { username, password, role }
+ * @param {number|null} actorId - the user ID creating the new user (null if system/CLI)
  * @returns {Promise<{ id, username, role, created_at }>}
  */
-async function createUser({ username, password, role }) {
+async function createUser({ username, password, role }, actorId = null) {
   const errors = [];
 
   // Validate username length
@@ -113,8 +120,18 @@ async function createUser({ username, password, role }) {
 
   const user = await User.create({ username, password_hash, role });
 
+  // Log the action
+  await logAction({ 
+    userId: actorId, 
+    action: ACTIONS.USER_CREATED, 
+    entityType: 'User', 
+    entityId: user.id, 
+    details: { role: user.role } 
+  });
+
   // Return safe user object (never return password_hash)
   return { id: user.id, username: user.username, role: user.role, created_at: user.created_at };
 }
 
 module.exports = { login, hashPassword, createUser };
+

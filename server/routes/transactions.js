@@ -9,7 +9,7 @@ const { authenticate, authorize } = require('../middleware/auth');
 // into the system. In production this would be a service account or internal API key.
 router.post('/', authenticate, async (req, res, next) => {
   try {
-    const result = await transactionService.ingestTransactions(req.body);
+    const result = await transactionService.ingestTransactions(req.body, req.user.id);
     
     if (!result.isArray) {
       // Return 201 Created with the single saved record
@@ -58,7 +58,7 @@ router.get('/', authenticate, authorize('analyst', 'supervisor', 'admin'), async
 // Accessible by analyst, supervisor, and admin roles.
 router.get('/:id', authenticate, authorize('analyst', 'supervisor', 'admin'), async (req, res, next) => {
   try {
-    const result = await transactionService.getTransactionById(req.params.id);
+    const result = await transactionService.getTransactionById(req.params.id, req.user.id);
     return res.json(result);
   } catch (error) {
     if (error.status) {
