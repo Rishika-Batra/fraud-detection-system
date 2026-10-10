@@ -2,6 +2,8 @@
 
 A comprehensive dashboard for managing and analyzing potentially fraudulent transactions. The system ingests transactions, scores them using a rule-based engine, and flags high-risk transactions for investigation by analysts and supervisors. The application includes role-based access control, a detailed case management workflow, and an extensive audit log for tracking all system activities.
 
+📚 **[View the API Contract for Frontend Developers](docs/api-contract.md)**
+
 ## Technology Stack
 
 *   **Frontend:** React
