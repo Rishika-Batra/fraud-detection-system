@@ -7,13 +7,15 @@
 const { Transaction } = require('../models');
 const { validateTransaction } = require('./transactionValidator');
 const { scoreTransaction } = require('./scoringEngine');
+const { logAction, ACTIONS } = require('./auditLogger');
 
 /**
  * Ingests a single transaction or an array of transactions.
  * @param {Object|Array} payload - The raw incoming transaction data.
+ * @param {number} actorId - The ID of the authenticated user performing this action.
  * @returns {Object} An object detailing the success/failure of the ingest operation.
  */
-async function ingestTransactions(payload) {
+async function ingestTransactions(payload, actorId) {
   const isArray = Array.isArray(payload);
   const items = isArray ? payload : [payload];
 
@@ -98,6 +100,15 @@ async function ingestTransactions(payload) {
     // Single transaction passed, save it
     // Create uses the model setter, but we stringified it above.
     const saved = await Transaction.create(validItemsToSave[0]);
+
+    await logAction({
+      userId: actorId,
+      action: ACTIONS.TRANSACTION_INGESTED,
+      entityType: 'Transaction',
+      entityId: saved.id,
+      details: { score: saved.risk_score }
+    });
+
     return { isArray: false, saved: formatSavedTransaction(saved) };
   }
 
@@ -109,6 +120,17 @@ async function ingestTransactions(payload) {
 
   // Save the valid ones using bulkCreate for efficiency (Returns 201 behavior)
   const savedItems = await Transaction.bulkCreate(validItemsToSave);
+
+  await logAction({
+    userId: actorId,
+    action: ACTIONS.TRANSACTION_INGESTED,
+    entityType: 'Transaction',
+    details: { 
+      ids: savedItems.map(s => s.id), 
+      scores: savedItems.map(s => s.risk_score) 
+    }
+  });
+
   return { 
     isArray: true, 
     saved: savedItems.map(formatSavedTransaction), 
@@ -268,9 +290,10 @@ async function listTransactions(query) {
  * Fetches a single transaction by ID, including its linked Case (or null).
  *
  * @param {string} rawId - The id param from the URL (still a string)
+ * @param {number} actorId - The user viewing the transaction
  * @returns {Object} The transaction with its Case included
  */
-async function getTransactionById(rawId) {
+async function getTransactionById(rawId, actorId) {
   // Validate that the id is numeric
   const id = Number(rawId);
   if (!Number.isInteger(id) || id < 1) {
@@ -283,6 +306,13 @@ async function getTransactionById(rawId) {
   if (!transaction) {
     throw { status: 404, message: "Transaction not found" };
   }
+
+  await logAction({ 
+    userId: actorId, 
+    action: ACTIONS.TRANSACTION_VIEWED, 
+    entityType: 'Transaction', 
+    entityId: transaction.id 
+  });
 
   // Format the response — risk_factors and amount are already handled by model getters.
   // Normalize the Case key: Sequelize uses the model name "Case" as the include key.
