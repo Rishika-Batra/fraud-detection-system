@@ -110,7 +110,7 @@ Authentication is handled via JWT (JSON Web Tokens).
 - **Example Response (200):**
   ```json
   {
-    "token": "eyJhbG...",
+    "token": "<JWT_TOKEN>",
     "user": {
       "id": 1,
       "username": "admin",
