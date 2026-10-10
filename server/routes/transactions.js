@@ -68,4 +68,18 @@ router.get('/:id', authenticate, authorize('analyst', 'supervisor', 'admin'), as
   }
 });
 
+// PATCH /api/transactions/:id/flag
+// Analyst and supervisor only. Sets is_flagged=true and creates a Case.
+router.patch('/:id/flag', authenticate, authorize('analyst', 'supervisor'), async (req, res, next) => {
+  try {
+    const newCase = await transactionService.flagTransaction(req.params.id, req.user.id);
+    return res.status(201).json(newCase);
+  } catch (error) {
+    if (error.status) {
+      return res.status(error.status).json({ error: error.message });
+    }
+    next(error);
+  }
+});
+
 module.exports = router;

@@ -137,6 +137,7 @@ module.exports = (sequelize) => {
     return this.findByPk(id, {
       include: [{
         model: CaseModel,
+        as: 'case',
         required: false // LEFT JOIN — returns the transaction even if no case exists
       }]
     });

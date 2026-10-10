@@ -45,8 +45,8 @@ async function hashPassword(plain) {
  * @returns {Promise<{ token: string, user: { id, username, role } }>}
  */
 async function login(username, password) {
-  // 1. Look up the user by username
-  const user = await User.findOne({ where: { username } });
+  // 1. Look up the user by username (using scope to read password_hash for comparison)
+  const user = await User.scope('withPassword').findOne({ where: { username } });
 
   if (!user) {
     // User not found — return generic message (never reveal that the username doesn't exist)
