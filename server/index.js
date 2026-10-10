@@ -4,6 +4,13 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 
+// Warn if JWT_SECRET is missing or still the default placeholder value.
+// This is a critical security check — a weak or missing secret compromises all tokens.
+if (!process.env.JWT_SECRET || process.env.JWT_SECRET === 'change_me') {
+  console.warn('⚠️  WARNING: JWT_SECRET is missing or set to the default "change_me".');
+  console.warn('   Set a strong, random secret in server/.env before deploying.');
+}
+
 // Import route modules
 const transactionRoutes = require('./routes/transactions');
 const caseRoutes = require('./routes/cases');
@@ -48,3 +55,4 @@ const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
+

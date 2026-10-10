@@ -1,11 +1,13 @@
 const express = require('express');
 const router = express.Router();
 const transactionService = require('../services/transactionService');
+const { authenticate, authorize } = require('../middleware/auth');
 
-// TODO: protect with authenticate middleware (auth comes later).
 // POST /api/transactions
-// Ingests simulated transaction data
-router.post('/', async (req, res, next) => {
+// Ingests simulated transaction data.
+// Any authenticated user can POST — this simulates an upstream data feed pushing transactions
+// into the system. In production this would be a service account or internal API key.
+router.post('/', authenticate, async (req, res, next) => {
   try {
     const result = await transactionService.ingestTransactions(req.body);
     
@@ -32,11 +34,11 @@ router.post('/', async (req, res, next) => {
   }
 });
 
-// TODO: protect with authenticate middleware (auth comes later).
 // GET /api/transactions
 // Lists transactions with optional filtering, sorting, and pagination.
 // All query-param validation and query building lives in the service/model layers.
-router.get('/', async (req, res, next) => {
+// Accessible by analyst, supervisor, and admin roles.
+router.get('/', authenticate, authorize('analyst', 'supervisor', 'admin'), async (req, res, next) => {
   try {
     const result = await transactionService.listTransactions(req.query);
     return res.json(result);
@@ -51,10 +53,10 @@ router.get('/', async (req, res, next) => {
   }
 });
 
-// TODO: protect with authenticate middleware (auth comes later).
 // GET /api/transactions/:id
 // Returns a single transaction by ID including its linked Case (or null if no case exists).
-router.get('/:id', async (req, res, next) => {
+// Accessible by analyst, supervisor, and admin roles.
+router.get('/:id', authenticate, authorize('analyst', 'supervisor', 'admin'), async (req, res, next) => {
   try {
     const result = await transactionService.getTransactionById(req.params.id);
     return res.json(result);
@@ -67,4 +69,3 @@ router.get('/:id', async (req, res, next) => {
 });
 
 module.exports = router;
-
