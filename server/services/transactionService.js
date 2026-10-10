@@ -4,7 +4,7 @@
  * Orchestrates validation, risk scoring (delegated to scoringEngine), and database persistence.
  */
 
-const { Transaction } = require('../models');
+const { Transaction, Case, sequelize } = require('../models');
 const { validateTransaction } = require('./transactionValidator');
 const { scoreTransaction } = require('./scoringEngine');
 const { logAction, ACTIONS } = require('./auditLogger');
@@ -315,13 +315,62 @@ async function getTransactionById(rawId, actorId) {
   });
 
   // Format the response — risk_factors and amount are already handled by model getters.
-  // Normalize the Case key: Sequelize uses the model name "Case" as the include key.
+  // We explicitly select only id, status, and assigned_to for the linked case.
   const result = transaction.toJSON();
-  result.case = result.Case || null;
-  delete result.Case;
+  
+  if (result.case) {
+    result.case = {
+      id: result.case.id,
+      status: result.case.status,
+      assigned_to: result.case.assigned_to
+    };
+  } else {
+    result.case = null;
+  }
 
   return result;
 }
 
-module.exports = { ingestTransactions, listTransactions, getTransactionById };
+/**
+ * Flags a transaction and creates a case for it.
+ * Uses a Sequelize database transaction to ensure atomicity.
+ * 
+ * @param {string} rawId - The transaction ID
+ * @param {number} actorId - The user performing the action
+ */
+async function flagTransaction(rawId, actorId) {
+  const id = Number(rawId);
+  if (!Number.isInteger(id)) throw { status: 400, message: "Transaction id must be a numeric integer" };
+
+  const transaction = await Transaction.findByPk(id);
+  if (!transaction) throw { status: 404, message: "Transaction not found" };
+
+  if (transaction.is_flagged) {
+    throw { status: 409, message: "Transaction is already flagged" };
+  }
+
+  const existingCase = await Case.findOne({ where: { transaction_id: id } });
+  if (existingCase) {
+    throw { status: 409, message: "Transaction already has a case" };
+  }
+
+  // Wrap multi-step write in a transaction so either both succeed or both fail.
+  // This prevents orphaned flags without cases or cases without flagged transactions.
+  const newCase = await sequelize.transaction(async (t) => {
+    transaction.is_flagged = true;
+    await transaction.save({ transaction: t });
+
+    return Case.create({
+      transaction_id: transaction.id,
+      status: 'flagged'
+    }, { transaction: t });
+  });
+
+  await logAction({ userId: actorId, action: ACTIONS.TRANSACTION_FLAGGED, entityType: 'Transaction', entityId: transaction.id });
+  await logAction({ userId: actorId, action: ACTIONS.CASE_CREATED, entityType: 'Case', entityId: newCase.id });
+
+  return newCase;
+}
+
+module.exports = { ingestTransactions, listTransactions, getTransactionById, flagTransaction };
 

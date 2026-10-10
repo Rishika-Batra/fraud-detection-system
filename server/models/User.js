@@ -27,6 +27,15 @@ module.exports = (sequelize) => {
     }
   }, {
     tableName: 'users',
-    timestamps: false
+    timestamps: false,
+    defaultScope: {
+      attributes: { exclude: ['password_hash'] }
+    },
+    scopes: {
+      withPassword: {
+        attributes: { include: ['password_hash'] }
+      }
+    }
   });
 };
+

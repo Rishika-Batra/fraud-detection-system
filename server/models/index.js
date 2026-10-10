@@ -23,20 +23,20 @@ const AuditLog = require('./AuditLog')(sequelize);
 // --- Define Associations ---
 
 // Transaction & Case: A Transaction may generate zero or one Case. A Case belongs to one Transaction.
-Transaction.hasOne(Case, { foreignKey: 'transaction_id' });
-Case.belongsTo(Transaction, { foreignKey: 'transaction_id' });
+Transaction.hasOne(Case, { foreignKey: 'transaction_id', as: 'case' });
+Case.belongsTo(Transaction, { foreignKey: 'transaction_id', as: 'transaction' });
 
 // User & Case: A User (assigned_to) owns many Cases. A Case belongs to one User.
 User.hasMany(Case, { foreignKey: 'assigned_to' });
-Case.belongsTo(User, { foreignKey: 'assigned_to' });
+Case.belongsTo(User, { foreignKey: 'assigned_to', as: 'assignee' });
 
 // Case & CaseNote: A Case has many CaseNotes. A CaseNote belongs to a Case.
 Case.hasMany(CaseNote, { foreignKey: 'case_id' });
-CaseNote.belongsTo(Case, { foreignKey: 'case_id' });
+CaseNote.belongsTo(Case, { foreignKey: 'case_id', as: 'case' });
 
 // User & CaseNote: A User can write many CaseNotes. A CaseNote is authored by one User.
 User.hasMany(CaseNote, { foreignKey: 'user_id' });
-CaseNote.belongsTo(User, { foreignKey: 'user_id' });
+CaseNote.belongsTo(User, { foreignKey: 'user_id', as: 'author' });
 
 // User & AuditLog: A User performs many actions (AuditLogs). An AuditLog is linked to a User.
 User.hasMany(AuditLog, { foreignKey: 'user_id' });
