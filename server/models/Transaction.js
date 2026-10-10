@@ -1,8 +1,8 @@
-const { DataTypes } = require('sequelize');
+const { DataTypes, Op } = require('sequelize');
 
 // Transaction model: stores ingested transaction data to be evaluated
 module.exports = (sequelize) => {
-  return sequelize.define('Transaction', {
+  const Transaction = sequelize.define('Transaction', {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     account_id: { type: DataTypes.STRING, allowNull: false },
     amount: { 
@@ -17,7 +17,23 @@ module.exports = (sequelize) => {
     timestamp: { type: DataTypes.DATE, allowNull: false, defaultValue: DataTypes.NOW },
     risk_score: { type: DataTypes.INTEGER, defaultValue: 0 },
     risk_level: { type: DataTypes.ENUM('low', 'medium', 'high'), defaultValue: 'low' },
-    risk_factors: { type: DataTypes.TEXT, allowNull: true }, // JSON stored as text
+    risk_factors: { 
+      type: DataTypes.TEXT, 
+      allowNull: true,
+      // Automatically parse JSON when retrieving from DB
+      get() {
+        const rawValue = this.getDataValue('risk_factors');
+        try {
+          return rawValue ? JSON.parse(rawValue) : [];
+        } catch(e) {
+          return [];
+        }
+      },
+      // Automatically stringify JSON when saving to DB if passed as array
+      set(val) {
+        this.setDataValue('risk_factors', typeof val === 'string' ? val : JSON.stringify(val || []));
+      }
+    },
     is_flagged: { type: DataTypes.BOOLEAN, defaultValue: false }
   }, {
     tableName: 'transactions',
@@ -28,4 +44,17 @@ module.exports = (sequelize) => {
       { fields: ['region'] }
     ]
   });
+
+  // Helper method to find recent transactions for a specific account (Context for scoring)
+  Transaction.findRecentByAccount = async function(accountId, sinceDate) {
+    return this.findAll({
+      where: { 
+        account_id: accountId, 
+        timestamp: { [Op.gte]: sinceDate } 
+      },
+      order: [['timestamp', 'DESC']] // Most recent first
+    });
+  };
+
+  return Transaction;
 };
