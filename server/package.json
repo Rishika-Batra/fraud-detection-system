@@ -7,8 +7,8 @@
     "start": "node index.js",
     "dev": "nodemon index.js",
     "db:init": "node db/init.js",
-    "db:seed": "node db/seed.js",
     "create-admin": "node db/createAdmin.js",
+    "seed": "node db/seed.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
