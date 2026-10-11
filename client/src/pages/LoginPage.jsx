@@ -104,26 +104,26 @@ export const LoginPage = () => {
           <div className="demo-buttons-grid">
             <button
               className="demo-role-btn role-analyst"
-              onClick={() => handleQuickLogin('analyst', 'password123')}
+              onClick={() => handleQuickLogin('analyst1', 'password123')}
             >
               <div className="role-btn-title">Analyst Account</div>
-              <div className="role-btn-sub">View & flag transactions</div>
+              <div className="role-btn-sub">analyst1 / password123</div>
             </button>
 
             <button
               className="demo-role-btn role-supervisor"
-              onClick={() => handleQuickLogin('supervisor', 'password123')}
+              onClick={() => handleQuickLogin('supervisor1', 'password123')}
             >
               <div className="role-btn-title">Supervisor Account</div>
-              <div className="role-btn-sub">Escalations & reports</div>
+              <div className="role-btn-sub">supervisor1 / password123</div>
             </button>
 
             <button
               className="demo-role-btn role-admin"
-              onClick={() => handleQuickLogin('admin', 'admin123')}
+              onClick={() => handleQuickLogin('admin', 'password123')}
             >
               <div className="role-btn-title">Admin Account</div>
-              <div className="role-btn-sub">Full audit & user mgmt</div>
+              <div className="role-btn-sub">admin / password123</div>
             </button>
           </div>
         </div>

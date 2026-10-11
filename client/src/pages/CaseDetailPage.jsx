@@ -88,7 +88,7 @@ export const CaseDetailPage = () => {
     if (hasRole('supervisor', 'admin')) {
       try {
         const users = await authService.getUsers();
-        setUserList(users || []);
+        setUserList(Array.isArray(users) ? users : (users?.data || users?.rows || []));
       } catch (err) {
         console.warn('Could not fetch user list for reassign:', err);
       }
@@ -105,9 +105,9 @@ export const CaseDetailPage = () => {
     setError(null);
     setSuccessMsg(null);
     try {
-      const updated = await caseService.updateStatus(id, nextStatus, `Status updated to ${nextStatus} by ${user?.username}`);
-      setCaseData(updated);
+      await caseService.updateStatus(id, nextStatus, `Status updated to ${nextStatus} by ${user?.username}`);
       setSuccessMsg(`Case workflow status updated to "${nextStatus.toUpperCase()}" successfully.`);
+      await fetchCaseDetails();
     } catch (err) {
       setError(err.message || `Failed to update status to ${nextStatus}`);
     } finally {
@@ -123,13 +123,10 @@ export const CaseDetailPage = () => {
     setError(null);
     setSuccessMsg(null);
     try {
-      const newNote = await caseService.addNote(id, noteText);
-      setCaseData(prev => ({
-        ...prev,
-        CaseNotes: [...(prev.CaseNotes || []), newNote]
-      }));
+      await caseService.addNote(id, noteText);
       setNoteText('');
       setSuccessMsg('Investigation note logged to audit trail.');
+      await fetchCaseDetails();
     } catch (err) {
       setError(err.message || 'Failed to add note');
     } finally {
@@ -143,9 +140,9 @@ export const CaseDetailPage = () => {
     setError(null);
     setSuccessMsg(null);
     try {
-      const updated = await caseService.assignCase(id, parseInt(selectedAssignee));
-      setCaseData(prev => ({ ...prev, assigned_to: updated.assigned_to, assignee: updated.assignee }));
+      await caseService.assignCase(id, parseInt(selectedAssignee));
       setSuccessMsg(`Case assigned to user ID #${selectedAssignee} successfully.`);
+      await fetchCaseDetails();
     } catch (err) {
       setError(err.message || 'Failed to reassign case');
     } finally {
@@ -174,7 +171,8 @@ export const CaseDetailPage = () => {
     );
   }
 
-  const { status, transaction, CaseNotes = [], assignee } = caseData;
+  const { status, transaction, assignee } = caseData;
+  const CaseNotes = caseData.CaseNotes || caseData.notes || [];
 
   return (
     <div className="case-detail-page">

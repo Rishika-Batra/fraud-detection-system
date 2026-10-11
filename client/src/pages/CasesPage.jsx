@@ -64,7 +64,8 @@ export const CasesPage = () => {
         risk_level: riskFilter || undefined
       };
       const res = await caseService.getCases(params);
-      setCases(res.rows || []);
+      const list = res?.data || res?.rows || (Array.isArray(res) ? res : []);
+      setCases(list);
     } catch (err) {
       console.warn('Backend cases fetch error, fallback to sample cases:', err);
       let filtered = [...SAMPLE_CASES];

@@ -81,8 +81,9 @@ export const DashboardPage = () => {
       };
 
       const res = await transactionService.getTransactions(params);
-      setTransactions(res.rows || []);
-      setTotalCount(res.count || (res.rows ? res.rows.length : 0));
+      const list = res?.data || res?.rows || (Array.isArray(res) ? res : []);
+      setTransactions(list);
+      setTotalCount(res?.pagination?.total ?? res?.count ?? list.length);
       setUsingSampleData(false);
     } catch (err) {
       console.warn('API error, switching to fallback sample feed:', err.message);
