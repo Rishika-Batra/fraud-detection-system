@@ -9,7 +9,14 @@
     "db:init": "node db/init.js",
     "create-admin": "node db/createAdmin.js",
     "seed": "node db/seed.js",
-    "test": "jest --rootDir .."
+    "test": "jest"
+  },
+  "jest": {
+    "rootDir": "..",
+    "moduleDirectories": [
+      "node_modules",
+      "server/node_modules"
+    ]
   },
   "keywords": [],
   "author": "",
