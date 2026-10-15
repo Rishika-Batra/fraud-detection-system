@@ -73,6 +73,11 @@ async function ingestTransactions(payload, actorId) {
     sanitizedTx.risk_level = riskResult.level;
     sanitizedTx.risk_factors = JSON.stringify(riskResult.factors); 
     
+    // High-risk transactions are flagged and generate an investigation case
+    if (riskResult.level === 'high') {
+      sanitizedTx.is_flagged = true;
+    }
+    
     validItemsToSave.push(sanitizedTx);
   }
 
@@ -97,9 +102,17 @@ async function ingestTransactions(payload, actorId) {
       throw { status: 400, message: "Validation failed", details: rejectedItems[0].errors };
     }
     
-    // Single transaction passed, save it
-    // Create uses the model setter, but we stringified it above.
-    const saved = await Transaction.create(validItemsToSave[0]);
+    // Single transaction passed, save it (wrap in transaction if case creation is needed)
+    const saved = await sequelize.transaction(async (t) => {
+      const tx = await Transaction.create(validItemsToSave[0], { transaction: t });
+      if (tx.is_flagged) {
+        await Case.create({
+          transaction_id: tx.id,
+          status: 'flagged'
+        }, { transaction: t });
+      }
+      return tx;
+    });
 
     await logAction({
       userId: actorId,
@@ -108,6 +121,24 @@ async function ingestTransactions(payload, actorId) {
       entityId: saved.id,
       details: { score: saved.risk_score }
     });
+
+    if (saved.is_flagged) {
+      const createdCase = await Case.findOne({ where: { transaction_id: saved.id } });
+      await logAction({
+        userId: actorId,
+        action: ACTIONS.TRANSACTION_FLAGGED,
+        entityType: 'Transaction',
+        entityId: saved.id
+      });
+      if (createdCase) {
+        await logAction({
+          userId: actorId,
+          action: ACTIONS.CASE_CREATED,
+          entityType: 'Case',
+          entityId: createdCase.id
+        });
+      }
+    }
 
     return { isArray: false, saved: formatSavedTransaction(saved) };
   }
@@ -119,7 +150,17 @@ async function ingestTransactions(payload, actorId) {
   }
 
   // Save the valid ones using bulkCreate for efficiency (Returns 201 behavior)
-  const savedItems = await Transaction.bulkCreate(validItemsToSave);
+  const savedItems = await sequelize.transaction(async (t) => {
+    const records = await Transaction.bulkCreate(validItemsToSave, { transaction: t });
+    const flaggedRecords = records.filter(r => r.is_flagged);
+    if (flaggedRecords.length > 0) {
+      await Case.bulkCreate(
+        flaggedRecords.map(r => ({ transaction_id: r.id, status: 'flagged' })),
+        { transaction: t }
+      );
+    }
+    return records;
+  });
 
   await logAction({
     userId: actorId,
