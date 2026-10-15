@@ -5,7 +5,7 @@ const path = require('path');
 // Connect to SQLite database
 // Determine the DB path, default to ./db/fraud.db relative to the server folder
 const dbPath = process.env.DB_PATH || './db/fraud.db';
-const absoluteDbPath = path.resolve(__dirname, '..', dbPath);
+const absoluteDbPath = dbPath === ':memory:' ? dbPath : path.resolve(__dirname, '..', dbPath);
 
 const sequelize = new Sequelize({
   dialect: 'sqlite',
