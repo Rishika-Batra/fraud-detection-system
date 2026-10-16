@@ -1,0 +1,64 @@
+name: Test
+
+on:
+  push:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  # Job 1: Backend tests
+  backend:
+    name: Backend Tests
+    runs-on: ubuntu-latest
+    env:
+      JWT_SECRET: test-secret
+    steps:
+      # Check out the repository code
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      # Set up Node.js 24 with npm caching using server/package-lock.json
+      - name: Set up Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: server/package-lock.json
+
+      # Install backend dependencies
+      - name: Install dependencies in server/
+        working-directory: server
+        run: npm ci
+
+      # Run backend tests
+      - name: Run tests in server/
+        working-directory: server
+        run: npm test
+
+  # Job 2: Frontend tests
+  frontend:
+    name: Frontend Tests
+    runs-on: ubuntu-latest
+    steps:
+      # Check out the repository code
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      # Set up Node.js 24 with npm caching using client/package-lock.json
+      - name: Set up Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: client/package-lock.json
+
+      # Install frontend dependencies
+      - name: Install dependencies in client/
+        working-directory: client
+        run: npm ci
+
+      # Run frontend tests
+      - name: Run tests in client/
+        working-directory: client
+        run: npm test
