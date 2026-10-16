@@ -18,11 +18,11 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
 
-      # Set up Node.js 20 with npm caching using server/package-lock.json
-      - name: Set up Node.js 20
+      # Set up Node.js 24 with npm caching using server/package-lock.json
+      - name: Set up Node.js 24
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24
           cache: npm
           cache-dependency-path: server/package-lock.json
 
@@ -45,11 +45,11 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
 
-      # Set up Node.js 20 with npm caching using client/package-lock.json
-      - name: Set up Node.js 20
+      # Set up Node.js 24 with npm caching using client/package-lock.json
+      - name: Set up Node.js 24
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24
           cache: npm
           cache-dependency-path: client/package-lock.json
 
