@@ -30,6 +30,7 @@ export const CaseDetailPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [successMsg, setSuccessMsg] = useState(null);
+  const [usingSampleData, setUsingSampleData] = useState(false);
 
   // Form states
   const [noteText, setNoteText] = useState('');
@@ -50,6 +51,7 @@ export const CaseDetailPage = () => {
       if (data.assigned_to) {
         setSelectedAssignee(data.assigned_to);
       }
+      setUsingSampleData(false);
     } catch (err) {
       console.warn('API error fetching case detail, using mock:', err);
       // Fallback mock detail for testing offline
@@ -78,7 +80,7 @@ export const CaseDetailPage = () => {
           { id: 2, note: 'Opened investigation. Verification request sent to cardholder account manager.', created_at: new Date(Date.now() - 1800000).toISOString(), author: { username: user?.username || 'rishika_analyst' } }
         ]
       });
-      setError(`Notice: Operating with cached case workspace (${err.message})`);
+      setUsingSampleData(true);
     } finally {
       setLoading(false);
     }
@@ -176,6 +178,16 @@ export const CaseDetailPage = () => {
 
   return (
     <div className="case-detail-page">
+      {/* Sample mode alert banner */}
+      {usingSampleData && (
+        <div className="alert alert-info" style={{ marginBottom: '1.25rem' }}>
+          <AlertTriangle size={18} />
+          <span>
+            <strong>Simulated Data Active:</strong> Backend service unreachable. Presenting structured fallback case workspace.
+          </span>
+        </div>
+      )}
+
       {/* Top Action Header */}
       <div className="case-header-nav">
         <button className="btn btn-secondary" onClick={() => navigate('/cases')}>

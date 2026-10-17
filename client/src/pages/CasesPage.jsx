@@ -49,6 +49,7 @@ export const CasesPage = () => {
   const [cases, setCases] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [usingSampleData, setUsingSampleData] = useState(false);
   const [activeTab, setActiveTab] = useState('');
   const [riskFilter, setRiskFilter] = useState('');
   const [page, setPage] = useState(1);
@@ -66,12 +67,14 @@ export const CasesPage = () => {
       const res = await caseService.getCases(params);
       const list = res?.data || res?.rows || (Array.isArray(res) ? res : []);
       setCases(list);
+      setUsingSampleData(false);
     } catch (err) {
       console.warn('Backend cases fetch error, fallback to sample cases:', err);
       let filtered = [...SAMPLE_CASES];
       if (activeTab) filtered = filtered.filter(c => c.status === activeTab);
       if (riskFilter) filtered = filtered.filter(c => c.transaction && c.transaction.risk_level === riskFilter);
       setCases(filtered);
+      setUsingSampleData(true);
       setError(`Backend case service notice: ${err.message}`);
     } finally {
       setLoading(false);
@@ -84,8 +87,18 @@ export const CasesPage = () => {
 
   return (
     <div className="cases-page">
-      {error && (
+      {/* Sample mode alert banner */}
+      {usingSampleData && (
         <div className="alert alert-info">
+          <AlertTriangle size={18} />
+          <span>
+            <strong>Simulated Data Active:</strong> Backend service unreachable. Presenting structured fallback case feed.
+          </span>
+        </div>
+      )}
+
+      {error && !usingSampleData && (
+        <div className="alert alert-error">
           <AlertTriangle size={18} />
           <span>{error}</span>
         </div>
