@@ -3,3 +3,5 @@ node_modules
 *.log
 dist
 server/db/fraud.db
+coverage/
+.vite/
