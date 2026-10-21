@@ -1,0 +1,272 @@
+[
+  {
+    "id": 1,
+    "user_id": 1,
+    "action": "LOGIN_SUCCESS",
+    "entity_type": "User",
+    "entity_id": 1,
+    "details": null,
+    "timestamp": "2026-10-01T08:30:00.000Z"
+  },
+  {
+    "id": 2,
+    "user_id": null,
+    "action": "LOGIN_FAILED",
+    "entity_type": "User",
+    "entity_id": null,
+    "details": "{\"username\": \"intruder_bot\"}",
+    "timestamp": "2026-10-01T08:45:00.000Z"
+  },
+  {
+    "id": 3,
+    "user_id": 1,
+    "action": "USER_CREATED",
+    "entity_type": "User",
+    "entity_id": 2,
+    "details": "{\"role\": \"analyst\"}",
+    "timestamp": "2026-10-01T08:50:00.000Z"
+  },
+  {
+    "id": 4,
+    "user_id": 2,
+    "action": "LOGIN_SUCCESS",
+    "entity_type": "User",
+    "entity_id": 2,
+    "details": null,
+    "timestamp": "2026-10-01T09:00:00.000Z"
+  },
+  {
+    "id": 5,
+    "user_id": 2,
+    "action": "TRANSACTION_INGESTED",
+    "entity_type": "Transaction",
+    "entity_id": 1001,
+    "details": "{\"score\": 0}",
+    "timestamp": "2026-10-01T12:14:01.000Z"
+  },
+  {
+    "id": 6,
+    "user_id": 2,
+    "action": "TRANSACTION_VIEWED",
+    "entity_type": "Transaction",
+    "entity_id": 1001,
+    "details": null,
+    "timestamp": "2026-10-01T12:20:00.000Z"
+  },
+  {
+    "id": 7,
+    "user_id": 2,
+    "action": "TRANSACTION_FLAGGED",
+    "entity_type": "Transaction",
+    "entity_id": 1013,
+    "details": null,
+    "timestamp": "2026-10-04T03:00:00.000Z"
+  },
+  {
+    "id": 8,
+    "user_id": 2,
+    "action": "CASE_CREATED",
+    "entity_type": "Case",
+    "entity_id": 1,
+    "details": null,
+    "timestamp": "2026-10-04T03:00:00.000Z"
+  },
+  {
+    "id": 9,
+    "user_id": 3,
+    "action": "TRANSACTION_FLAGGED",
+    "entity_type": "Transaction",
+    "entity_id": 1014,
+    "details": null,
+    "timestamp": "2026-10-04T04:20:00.000Z"
+  },
+  {
+    "id": 10,
+    "user_id": 3,
+    "action": "CASE_CREATED",
+    "entity_type": "Case",
+    "entity_id": 2,
+    "details": null,
+    "timestamp": "2026-10-04T04:20:00.000Z"
+  },
+  {
+    "id": 11,
+    "user_id": 2,
+    "action": "TRANSACTION_FLAGGED",
+    "entity_type": "Transaction",
+    "entity_id": 1015,
+    "details": null,
+    "timestamp": "2026-10-04T14:40:00.000Z"
+  },
+  {
+    "id": 12,
+    "user_id": 2,
+    "action": "CASE_CREATED",
+    "entity_type": "Case",
+    "entity_id": 3,
+    "details": null,
+    "timestamp": "2026-10-04T14:40:00.000Z"
+  },
+  {
+    "id": 13,
+    "user_id": 2,
+    "action": "CASE_STATUS_CHANGED",
+    "entity_type": "Case",
+    "entity_id": 3,
+    "details": "{\"from\": \"flagged\", \"to\": \"investigating\"}",
+    "timestamp": "2026-10-04T15:10:00.000Z"
+  },
+  {
+    "id": 14,
+    "user_id": 2,
+    "action": "CASE_NOTE_ADDED",
+    "entity_type": "Case",
+    "entity_id": 3,
+    "details": "{\"note_id\": 1}",
+    "timestamp": "2026-10-04T15:15:00.000Z"
+  },
+  {
+    "id": 15,
+    "user_id": 3,
+    "action": "TRANSACTION_FLAGGED",
+    "entity_type": "Transaction",
+    "entity_id": 1023,
+    "details": null,
+    "timestamp": "2026-10-05T10:10:00.000Z"
+  },
+  {
+    "id": 16,
+    "user_id": 3,
+    "action": "CASE_CREATED",
+    "entity_type": "Case",
+    "entity_id": 4,
+    "details": null,
+    "timestamp": "2026-10-05T10:10:00.000Z"
+  },
+  {
+    "id": 17,
+    "user_id": 3,
+    "action": "CASE_STATUS_CHANGED",
+    "entity_type": "Case",
+    "entity_id": 4,
+    "details": "{\"from\": \"flagged\", \"to\": \"investigating\"}",
+    "timestamp": "2026-10-05T10:30:00.000Z"
+  },
+  {
+    "id": 18,
+    "user_id": 3,
+    "action": "CASE_NOTE_ADDED",
+    "entity_type": "Case",
+    "entity_id": 4,
+    "details": "{\"note_id\": 2}",
+    "timestamp": "2026-10-05T10:35:00.000Z"
+  },
+  {
+    "id": 19,
+    "user_id": 4,
+    "action": "TRANSACTION_FLAGGED",
+    "entity_type": "Transaction",
+    "entity_id": 1025,
+    "details": null,
+    "timestamp": "2026-10-05T14:20:00.000Z"
+  },
+  {
+    "id": 20,
+    "user_id": 4,
+    "action": "CASE_CREATED",
+    "entity_type": "Case",
+    "entity_id": 5,
+    "details": null,
+    "timestamp": "2026-10-05T14:20:00.000Z"
+  },
+  {
+    "id": 21,
+    "user_id": 2,
+    "action": "TRANSACTION_FLAGGED",
+    "entity_type": "Transaction",
+    "entity_id": 1026,
+    "details": null,
+    "timestamp": "2026-10-06T03:20:00.000Z"
+  },
+  {
+    "id": 22,
+    "user_id": 2,
+    "action": "CASE_CREATED",
+    "entity_type": "Case",
+    "entity_id": 6,
+    "details": null,
+    "timestamp": "2026-10-06T03:20:00.000Z"
+  },
+  {
+    "id": 23,
+    "user_id": 5,
+    "action": "CASE_ASSIGNED",
+    "entity_type": "Case",
+    "entity_id": 6,
+    "details": "{\"assigned_to\": 5}",
+    "timestamp": "2026-10-06T05:30:00.000Z"
+  },
+  {
+    "id": 24,
+    "user_id": 5,
+    "action": "CASE_STATUS_CHANGED",
+    "entity_type": "Case",
+    "entity_id": 6,
+    "details": "{\"from\": \"investigating\", \"to\": \"escalated\"}",
+    "timestamp": "2026-10-06T06:00:00.000Z"
+  },
+  {
+    "id": 25,
+    "user_id": 2,
+    "action": "CASE_STATUS_CHANGED",
+    "entity_type": "Case",
+    "entity_id": 9,
+    "details": "{\"from\": \"investigating\", \"to\": \"resolved\"}",
+    "timestamp": "2026-10-08T09:30:00.000Z"
+  },
+  {
+    "id": 26,
+    "user_id": 5,
+    "action": "CASE_STATUS_CHANGED",
+    "entity_type": "Case",
+    "entity_id": 11,
+    "details": "{\"from\": \"escalated\", \"to\": \"closed\"}",
+    "timestamp": "2026-10-09T16:00:00.000Z"
+  },
+  {
+    "id": 27,
+    "user_id": 6,
+    "action": "CASE_STATUS_CHANGED",
+    "entity_type": "Case",
+    "entity_id": 12,
+    "details": "{\"from\": \"escalated\", \"to\": \"closed\"}",
+    "timestamp": "2026-10-10T10:00:00.000Z"
+  },
+  {
+    "id": 28,
+    "user_id": 5,
+    "action": "REPORT_EXPORTED",
+    "entity_type": "Report",
+    "entity_id": null,
+    "details": "{\"type\": \"cases\", \"format\": \"csv\"}",
+    "timestamp": "2026-10-10T11:00:00.000Z"
+  },
+  {
+    "id": 29,
+    "user_id": 6,
+    "action": "REPORT_EXPORTED",
+    "entity_type": "Report",
+    "entity_id": null,
+    "details": "{\"type\": \"fraud_summary\", \"format\": \"pdf\"}",
+    "timestamp": "2026-10-10T11:30:00.000Z"
+  },
+  {
+    "id": 30,
+    "user_id": 2,
+    "action": "LOGOUT",
+    "entity_type": "User",
+    "entity_id": 2,
+    "details": null,
+    "timestamp": "2026-10-10T12:00:00.000Z"
+  }
+]

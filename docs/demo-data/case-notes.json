@@ -1,0 +1,130 @@
+[
+  {
+    "id": 1,
+    "case_id": 3,
+    "user_id": 2,
+    "note": "Contacted cardholder to verify transfer of INR 250,000. Customer stated they initiated this for property purchase.",
+    "evidence_reference": "call-recording-ACC1025.mp3",
+    "created_at": "2026-10-04T15:15:00.000Z"
+  },
+  {
+    "id": 2,
+    "case_id": 4,
+    "user_id": 3,
+    "note": "High velocity pattern detected: 6 transactions within 4 minutes. Initiated temporary card lock.",
+    "evidence_reference": "velocity-burst-log.pdf",
+    "created_at": "2026-10-05T10:35:00.000Z"
+  },
+  {
+    "id": 3,
+    "case_id": 4,
+    "user_id": 3,
+    "note": "Customer contacted support hotline stating phone was stolen. Confirmed unauthorized activity.",
+    "evidence_reference": "support-ticket-8821.pdf",
+    "created_at": "2026-10-05T11:20:00.000Z"
+  },
+  {
+    "id": 4,
+    "case_id": 5,
+    "user_id": 4,
+    "note": "Impossible travel time detected: Mumbai at 14:00 to Kolkata at 14:15. Contacting issuing bank.",
+    "evidence_reference": "geo-ip-trace-ACC1029.png",
+    "created_at": "2026-10-05T14:55:00.000Z"
+  },
+  {
+    "id": 5,
+    "case_id": 6,
+    "user_id": 2,
+    "note": "Large round-number crypto transfer at 03:10 AM UTC. Customer account shows no prior crypto history.",
+    "evidence_reference": "account-history-ACC1030.pdf",
+    "created_at": "2026-10-06T04:00:00.000Z"
+  },
+  {
+    "id": 6,
+    "case_id": 6,
+    "user_id": 5,
+    "note": "Escalating case to Financial Intelligence Unit due to AML threshold breach.",
+    "evidence_reference": "fiu-referral-memo.pdf",
+    "created_at": "2026-10-06T06:00:00.000Z"
+  },
+  {
+    "id": 7,
+    "case_id": 7,
+    "user_id": 3,
+    "note": "Account ACC1034 transferred INR 220,000 via Wire. IP address originates from high-risk hosting subnet.",
+    "evidence_reference": "ip-intel-subnet.txt",
+    "created_at": "2026-10-07T10:45:00.000Z"
+  },
+  {
+    "id": 8,
+    "case_id": 7,
+    "user_id": 6,
+    "note": "Escalated for senior fraud manager review and account debit freeze.",
+    "evidence_reference": "freeze-order-991.pdf",
+    "created_at": "2026-10-07T11:45:00.000Z"
+  },
+  {
+    "id": 9,
+    "case_id": 8,
+    "user_id": 4,
+    "note": "Delhi to Pune physical transaction anomaly. INR 210,000 crypto purchase.",
+    "evidence_reference": "merchant-query-crypto.pdf",
+    "created_at": "2026-10-07T12:30:00.000Z"
+  },
+  {
+    "id": 10,
+    "case_id": 8,
+    "user_id": 5,
+    "note": "Supervisor escalation approved. Transaction reported to National Cyber Crime Portal.",
+    "evidence_reference": "portal-ref-NCCP2026.pdf",
+    "created_at": "2026-10-07T13:00:00.000Z"
+  },
+  {
+    "id": 11,
+    "case_id": 9,
+    "user_id": 2,
+    "note": "High ATM withdrawal INR 82,000 verified against branch CCTV. Cardholder confirmed identity.",
+    "evidence_reference": "cctv-still-atm-mumbai.jpg",
+    "created_at": "2026-10-08T08:30:00.000Z"
+  },
+  {
+    "id": 12,
+    "case_id": 9,
+    "user_id": 2,
+    "note": "Resolution: Legitimate withdrawal by account holder. False positive flag marked resolved.",
+    "evidence_reference": null,
+    "created_at": "2026-10-08T09:30:00.000Z"
+  },
+  {
+    "id": 13,
+    "case_id": 10,
+    "user_id": 3,
+    "note": "Night transfer INR 95,000 verified via 2FA token authentication log. Legitimate transaction.",
+    "evidence_reference": "2fa-auth-audit.log",
+    "created_at": "2026-10-08T11:00:00.000Z"
+  },
+  {
+    "id": 14,
+    "case_id": 11,
+    "user_id": 5,
+    "note": "Chargeback completed. Funds recovered and account restored. Case marked closed.",
+    "evidence_reference": "chargeback-settlement.pdf",
+    "created_at": "2026-10-09T16:00:00.000Z"
+  },
+  {
+    "id": 15,
+    "case_id": 12,
+    "user_id": 4,
+    "note": "Wire transfer confirmed fraudulent. Police FIR filed reference #FIR-4491-BLR.",
+    "evidence_reference": "police-fir-copy.pdf",
+    "created_at": "2026-10-09T14:30:00.000Z"
+  },
+  {
+    "id": 16,
+    "case_id": 12,
+    "user_id": 6,
+    "note": "Final supervisory sign-off. Fraud loss booked to insurance reserves. Case closed.",
+    "evidence_reference": "insurance-claim-settled.pdf",
+    "created_at": "2026-10-10T10:00:00.000Z"
+  }
+]

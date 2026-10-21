@@ -1,0 +1,31 @@
+id,user_id,action,entity_type,entity_id,details,timestamp
+1,1,LOGIN_SUCCESS,User,1,,2026-10-01T08:30:00.000Z
+2,,LOGIN_FAILED,User,,"{""username"": ""intruder_bot""}",2026-10-01T08:45:00.000Z
+3,1,USER_CREATED,User,2,"{""role"": ""analyst""}",2026-10-01T08:50:00.000Z
+4,2,LOGIN_SUCCESS,User,2,,2026-10-01T09:00:00.000Z
+5,2,TRANSACTION_INGESTED,Transaction,1001,"{""score"": 0}",2026-10-01T12:14:01.000Z
+6,2,TRANSACTION_VIEWED,Transaction,1001,,2026-10-01T12:20:00.000Z
+7,2,TRANSACTION_FLAGGED,Transaction,1013,,2026-10-04T03:00:00.000Z
+8,2,CASE_CREATED,Case,1,,2026-10-04T03:00:00.000Z
+9,3,TRANSACTION_FLAGGED,Transaction,1014,,2026-10-04T04:20:00.000Z
+10,3,CASE_CREATED,Case,2,,2026-10-04T04:20:00.000Z
+11,2,TRANSACTION_FLAGGED,Transaction,1015,,2026-10-04T14:40:00.000Z
+12,2,CASE_CREATED,Case,3,,2026-10-04T14:40:00.000Z
+13,2,CASE_STATUS_CHANGED,Case,3,"{""from"": ""flagged"", ""to"": ""investigating""}",2026-10-04T15:10:00.000Z
+14,2,CASE_NOTE_ADDED,Case,3,"{""note_id"": 1}",2026-10-04T15:15:00.000Z
+15,3,TRANSACTION_FLAGGED,Transaction,1023,,2026-10-05T10:10:00.000Z
+16,3,CASE_CREATED,Case,4,,2026-10-05T10:10:00.000Z
+17,3,CASE_STATUS_CHANGED,Case,4,"{""from"": ""flagged"", ""to"": ""investigating""}",2026-10-05T10:30:00.000Z
+18,3,CASE_NOTE_ADDED,Case,4,"{""note_id"": 2}",2026-10-05T10:35:00.000Z
+19,4,TRANSACTION_FLAGGED,Transaction,1025,,2026-10-05T14:20:00.000Z
+20,4,CASE_CREATED,Case,5,,2026-10-05T14:20:00.000Z
+21,2,TRANSACTION_FLAGGED,Transaction,1026,,2026-10-06T03:20:00.000Z
+22,2,CASE_CREATED,Case,6,,2026-10-06T03:20:00.000Z
+23,5,CASE_ASSIGNED,Case,6,"{""assigned_to"": 5}",2026-10-06T05:30:00.000Z
+24,5,CASE_STATUS_CHANGED,Case,6,"{""from"": ""investigating"", ""to"": ""escalated""}",2026-10-06T06:00:00.000Z
+25,2,CASE_STATUS_CHANGED,Case,9,"{""from"": ""investigating"", ""to"": ""resolved""}",2026-10-08T09:30:00.000Z
+26,5,CASE_STATUS_CHANGED,Case,11,"{""from"": ""escalated"", ""to"": ""closed""}",2026-10-09T16:00:00.000Z
+27,6,CASE_STATUS_CHANGED,Case,12,"{""from"": ""escalated"", ""to"": ""closed""}",2026-10-10T10:00:00.000Z
+28,5,REPORT_EXPORTED,Report,,"{""type"": ""cases"", ""format"": ""csv""}",2026-10-10T11:00:00.000Z
+29,6,REPORT_EXPORTED,Report,,"{""type"": ""fraud_summary"", ""format"": ""pdf""}",2026-10-10T11:30:00.000Z
+30,2,LOGOUT,User,2,,2026-10-10T12:00:00.000Z

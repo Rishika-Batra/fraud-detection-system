@@ -1,0 +1,7 @@
+id,username,password_hash,role,created_at
+1,admin_rohit,$2a$10$7EqJtq98hPqEX7fNZaFWoOhi5Kj1HkJ8q4hC3s.h7K4A1.3lM5hOq,admin,2026-09-01T08:00:00.000Z
+2,analyst_priya,$2a$10$7EqJtq98hPqEX7fNZaFWoOhi5Kj1HkJ8q4hC3s.h7K4A1.3lM5hOq,analyst,2026-09-01T08:15:00.000Z
+3,analyst_arjun,$2a$10$7EqJtq98hPqEX7fNZaFWoOhi5Kj1HkJ8q4hC3s.h7K4A1.3lM5hOq,analyst,2026-09-01T08:30:00.000Z
+4,analyst_kavita,$2a$10$7EqJtq98hPqEX7fNZaFWoOhi5Kj1HkJ8q4hC3s.h7K4A1.3lM5hOq,analyst,2026-09-01T08:45:00.000Z
+5,supervisor_vikram,$2a$10$7EqJtq98hPqEX7fNZaFWoOhi5Kj1HkJ8q4hC3s.h7K4A1.3lM5hOq,supervisor,2026-09-01T09:00:00.000Z
+6,supervisor_neha,$2a$10$7EqJtq98hPqEX7fNZaFWoOhi5Kj1HkJ8q4hC3s.h7K4A1.3lM5hOq,supervisor,2026-09-01T09:15:00.000Z
