@@ -246,6 +246,22 @@ A GitHub Actions workflow (`.github/workflows/test.yml`) runs all backend and fr
 
 ---
 
+## CSV Transaction Ingestion & Sample Data
+
+Analysts and supervisors can ingest batches of transactions via CSV upload (`POST /api/transactions/upload`):
+
+- **Smart Column Detection:** Automatically matches aliases (e.g., `account`, `amt`, `ccy`, `vendor`, `type`, `country`, `date`) and supports custom JSON header overrides.
+- **Row Validation & Line Reporting:** Validates amount, currency, transaction type, and timestamps (`ISO 8601` or `YYYY-MM-DD HH:mm:ss`), returning error reports indexed by CSV line number.
+- **Automated Deduplication:** Skips repeated rows within the file or previously ingested transactions without rejecting good data.
+- **Dry Run:** Query parameter `?dry_run=true` evaluates file validity, provides column mapping reports, and returns a preview without database mutation.
+- **Sample Data:** A canonical reference CSV containing 10 synthetic transactions (mixed normal and high-risk from September 2026) is provided at [`docs/sample-data/sample-transactions.csv`](docs/sample-data/sample-transactions.csv).
+
+> **Using real data:**
+> - Uploaded timestamps without a timezone are treated as UTC.
+> - Uploads may contain personal or financial information, so only upload data you are permitted to use and never commit real data files to git.
+
+---
+
 ## Documentation Directory
 
 Additional project documentation is maintained in the `docs/` folder:
@@ -254,3 +270,4 @@ Additional project documentation is maintained in the `docs/` folder:
 - 📋 **[Traceability Matrix (RTM)](docs/traceability-matrix.md)**: Formal SRS requirements (FR-01 to FR-11) mapped to components and APIs.
 - 🧪 **[Test Plan](docs/test-plan.md)**: Test strategy, scope, environment configurations, and test cases.
 - 📊 **[Test Summary Report](docs/test-summary.md)**: Formal test execution report, pass/fail results, and code coverage.
+- 📁 **[Sample CSV](docs/sample-data/sample-transactions.csv)**: Reference 10-row canonical transaction CSV dataset.

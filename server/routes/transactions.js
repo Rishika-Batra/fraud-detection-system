@@ -1,7 +1,67 @@
 const express = require('express');
 const router = express.Router();
+const multer = require('multer');
 const transactionService = require('../services/transactionService');
+const csvImportService = require('../services/csvImportService');
 const { authenticate, authorize } = require('../middleware/auth');
+
+// Multer in-memory storage for handling multipart/form-data CSV uploads (5 MB limit)
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 5 * 1024 * 1024 }
+});
+
+// POST /api/transactions/upload
+// Upload and ingest transactions from a CSV file.
+// Supports dry_run mode, custom header mappings, automated deduplication, and risk scoring.
+// Restricted to analyst and supervisor roles.
+router.post(
+  '/upload',
+  authenticate,
+  authorize('analyst', 'supervisor'),
+  (req, res, next) => {
+    upload.single('file')(req, res, (err) => {
+      if (err) {
+        if (err.code === 'LIMIT_FILE_SIZE') {
+          return res.status(413).json({ error: 'File size exceeds maximum limit of 5 MB' });
+        }
+        return res.status(400).json({ error: err.message });
+      }
+      next();
+    });
+  },
+  async (req, res, next) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ error: 'No file uploaded. Please upload a CSV file using the "file" field.' });
+      }
+
+      const isDryRun = req.query.dry_run === 'true' || req.query.dry_run === true || req.body.dry_run === 'true';
+      const mapping = req.body.mapping;
+
+      const result = await csvImportService.processCsvBuffer(
+        req.file.buffer,
+        {
+          mapping,
+          dry_run: isDryRun,
+          fileName: req.file.originalname
+        },
+        req.user.id
+      );
+
+      const statusCode = isDryRun ? 200 : 201;
+      return res.status(statusCode).json(result);
+    } catch (error) {
+      if (error.status) {
+        const payload = { error: error.message };
+        if (error.details) payload.details = error.details;
+        if (error.columns) payload.columns = error.columns;
+        return res.status(error.status).json(payload);
+      }
+      next(error);
+    }
+  }
+);
 
 // POST /api/transactions
 // Ingests simulated transaction data.

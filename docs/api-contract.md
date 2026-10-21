@@ -30,6 +30,7 @@ Authentication is handled via JWT (JSON Web Tokens).
 | `POST /api/auth/users` | ❌ | ❌ | ✅ |
 | `GET /api/auth/users` | ❌ | ❌ | ✅ |
 | `POST /api/transactions` | ✅ | ✅ | ✅ |
+| `POST /api/transactions/upload` | ✅ | ✅ | ❌ |
 | `GET /api/transactions` | ✅ | ✅ | ✅ |
 | `GET /api/transactions/:id` | ✅ | ✅ | ✅ |
 | `PATCH /api/transactions/:id/flag` | ✅ | ✅ | ❌ |
@@ -78,7 +79,7 @@ Authentication is handled via JWT (JSON Web Tokens).
 - **Roles:** `admin`, `analyst`, `supervisor`
 - **Case Statuses:** `flagged`, `investigating`, `resolved`, `escalated`, `closed`
 - **Audit Actions:**
-  - `LOGIN_SUCCESS`, `LOGIN_FAILED`, `LOGOUT`, `USER_CREATED`, `TRANSACTION_INGESTED`, `TRANSACTION_VIEWED`, `TRANSACTION_FLAGGED`, `CASE_CREATED`, `CASE_STATUS_CHANGED`, `CASE_NOTE_ADDED`, `CASE_ASSIGNED`, `REPORT_EXPORTED`
+  - `LOGIN_SUCCESS`, `LOGIN_FAILED`, `LOGOUT`, `USER_CREATED`, `TRANSACTION_INGESTED`, `TRANSACTION_VIEWED`, `TRANSACTION_FLAGGED`, `CASE_CREATED`, `CASE_STATUS_CHANGED`, `CASE_NOTE_ADDED`, `CASE_ASSIGNED`, `REPORT_EXPORTED`, `CSV_UPLOADED`
 
 ## Case Workflow
 
@@ -150,14 +151,60 @@ Authentication is handled via JWT (JSON Web Tokens).
 - **Body:** Single transaction object or array of transactions (max 500).
 - **Errors:** `400` (Validation / Payload too large)
 
+**`POST /api/transactions/upload`**
+- **Auth:** Analyst, Supervisor
+- **Content-Type:** `multipart/form-data`
+- **Fields:**
+  - `file` (File, required): CSV file to ingest (max 5 MB, max 5000 rows).
+  - `mapping` (string / JSON object, optional): Custom column mapping overrides (e.g. `{"ClientAccount":"account_id"}`).
+- **Query Params:**
+  - `dry_run` (`true` | `false`, opt): When `true`, parses, validates, and simulates deduplication and column reporting without persisting records to the database or creating cases.
+- **Example Response (201 Created):**
+  ```json
+  {
+    "upload_batch": "upload-1729483800000",
+    "total_rows": 10,
+    "saved_count": 8,
+    "rejected_count": 1,
+    "duplicate_count": 1,
+    "rejected": [
+      {
+        "line": 4,
+        "errors": ["currency must be a 3-letter uppercase code"]
+      }
+    ],
+    "columns": {
+      "matched": {
+        "account": "account_id",
+        "amt": "amount",
+        "ccy": "currency",
+        "vendor": "merchant",
+        "type": "transaction_type",
+        "country": "region",
+        "date": "timestamp"
+      },
+      "ignored": [],
+      "missing": []
+    }
+  }
+  ```
+- **Example Response (200 OK for dry_run):**
+  Same payload as 201 above, plus `dry_run: true`, `valid_count`, and `preview` (first 20 validated rows).
+- **Errors:**
+  - `400` (Empty file, unparseable CSV, missing required columns with report, rows limit exceeded, or invalid mapping)
+  - `413` (File size exceeds 5 MB)
+  - `401` (Unauthorized)
+  - `403` (Forbidden — admin role blocked)
+
 **`GET /api/transactions`**
 - **Auth:** All authenticated roles
 - **Query Params:**
   - `from`, `to` (ISO dates, opt)
   - `min_amount`, `max_amount` (number, opt)
   - `min_risk`, `max_risk` (number, opt)
-  - `risk_level` (enum, opt)
+  - `risk_level` (enum: `low`, `medium`, `high`, opt)
   - `region`, `account_id`, `transaction_type` (string, opt)
+  - `source` (enum: `demo`, `uploaded`, opt)
   - `is_flagged` (boolean, opt)
   - `sort_by` (`timestamp`, `amount`, `risk_score`, opt)
   - `order` (`asc`, `desc`, opt)
