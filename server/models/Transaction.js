@@ -39,14 +39,27 @@ module.exports = (sequelize) => {
         this.setDataValue('risk_factors', typeof val === 'string' ? val : JSON.stringify(val || []));
       }
     },
-    is_flagged: { type: DataTypes.BOOLEAN, defaultValue: false }
+    is_flagged: { type: DataTypes.BOOLEAN, defaultValue: false },
+    source: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      defaultValue: 'demo',
+      validate: {
+        isIn: [['demo', 'uploaded']]
+      }
+    },
+    upload_batch: {
+      type: DataTypes.STRING,
+      allowNull: true
+    }
   }, {
     tableName: 'transactions',
     timestamps: false,
     indexes: [
       { fields: ['timestamp'] },
       { fields: ['risk_score'] },
-      { fields: ['region'] }
+      { fields: ['region'] },
+      { fields: ['source'] }
     ]
   });
 
@@ -101,6 +114,7 @@ module.exports = (sequelize) => {
     if (filters.account_id)       where.account_id = filters.account_id;
     if (filters.transaction_type) where.transaction_type = filters.transaction_type;
     if (filters.is_flagged !== undefined) where.is_flagged = filters.is_flagged;
+    if (filters.source)           where.source = filters.source;
 
     // --- Sorting ---
     const sortBy = filters.sort_by || 'risk_score';

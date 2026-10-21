@@ -346,7 +346,8 @@ async function seed() {
       risk_score: score,
       risk_level: level,
       risk_factors: JSON.stringify(factors),
-      is_flagged: false
+      is_flagged: false,
+      source: 'demo'
     });
 
     // Track for future context lookups

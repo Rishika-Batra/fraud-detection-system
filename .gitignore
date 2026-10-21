@@ -5,3 +5,7 @@ dist
 server/db/fraud.db
 coverage/
 .vite/
+
+# Real data files must never be committed
+*.csv
+!docs/sample-data/*.csv

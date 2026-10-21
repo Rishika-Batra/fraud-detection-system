@@ -43,7 +43,9 @@ async function ingestTransactions(payload, actorId) {
       merchant: rawTx.merchant,
       transaction_type: rawTx.transaction_type,
       region: rawTx.region,
-      timestamp: rawTx.timestamp
+      timestamp: rawTx.timestamp,
+      source: rawTx.source || 'demo',
+      upload_batch: rawTx.upload_batch || null
     };
 
     // 1. Run validation
@@ -248,6 +250,16 @@ function parseAndValidateQueryParams(query) {
       errors.push("transaction_type must be one of: purchase, transfer, withdrawal, deposit");
     } else {
       filters.transaction_type = query.transaction_type;
+    }
+  }
+
+  // --- Source filter ---
+  if (query.source) {
+    const validSources = ['demo', 'uploaded'];
+    if (!validSources.includes(query.source)) {
+      errors.push("source must be one of: demo, uploaded");
+    } else {
+      filters.source = query.source;
     }
   }
 

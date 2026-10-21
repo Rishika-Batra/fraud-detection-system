@@ -226,14 +226,14 @@ async function getHeatmap(query) {
 function escapeCsvValue(val) {
   if (val === null || val === undefined) return '';
   let str = String(val);
-  // CSV Injection protection: prefix with quote if starts with dangerous char
-  if (/^[=+\-@]/.test(str)) {
+  // CSV Injection protection: prefix with quote if starts with dangerous char (=, +, -, @, tab, CR)
+  if (/^[=+\-@\t\r]/.test(str)) {
     str = "'" + str;
   }
   // Escape quotes
   str = str.replace(/"/g, '""');
-  // Wrap in quotes if it contains comma, newline, or quote
-  if (/[",\n\r]/.test(str) || /^[=+\-@]/.test(str)) {
+  // Wrap in quotes if it contains comma, newline, carriage return, tab, or quote, or if prefixed
+  if (/[",\n\r\t]/.test(str) || /^['=+\-@\t\r]/.test(str)) {
     return `"${str}"`;
   }
   return str;
@@ -389,4 +389,4 @@ async function exportData(req, res) {
   });
 }
 
-module.exports = { getSummary, getTrends, getHeatmap, exportData };
+module.exports = { getSummary, getTrends, getHeatmap, exportData, escapeCsvValue };
