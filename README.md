@@ -252,5 +252,9 @@ Additional project documentation is maintained in the `docs/` folder:
 
 - 📑 **[API Contract](docs/api-contract.md)**: Full REST endpoints specification, request/response payloads, and status codes.
 - 📋 **[Traceability Matrix (RTM)](docs/traceability-matrix.md)**: Formal SRS requirements (FR-01 to FR-11) mapped to components and APIs.
+- 📋 **[Requirements Traceability Matrix (Comprehensive RTM)](docs/requirements-traceability-matrix.md)**: Complete 10-column traceability matrix covering FR-01 through FR-11 and NFR-01 through NFR-07 (Rohit Arya).
+- 🔍 **[Requirements Validation Report](docs/requirements-validation-report.md)**: Detailed feature-by-feature verification against Experiment 3 User Stories (US-01 through US-11).
+- 🔐 **[Auth & Audit Requirements Specification](docs/auth-audit-requirements.md)**: Specification for authentication failure handling, RBAC permission matrix, and tamper-evident audit logging.
+- 📊 **[Realistic Demo Datasets](docs/demo-data/README.md)**: Fictional datasets in dual JSON and CSV formats with automated referential integrity validator (`validate_demo_data.py`).
 - 🧪 **[Test Plan](docs/test-plan.md)**: Test strategy, scope, environment configurations, and test cases.
 - 📊 **[Test Summary Report](docs/test-summary.md)**: Formal test execution report, pass/fail results, and code coverage.
