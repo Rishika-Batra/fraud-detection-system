@@ -260,6 +260,23 @@ Analysts and supervisors can ingest batches of transactions via CSV upload (`POS
 > - Uploaded timestamps without a timezone are treated as UTC.
 > - Uploads may contain personal or financial information, so only upload data you are permitted to use and never commit real data files to git.
 
+> **Known limitations:**
+> - Scoring rules compare raw amounts and do not convert between currencies.
+
+### Upload Data (UI Page)
+
+A dedicated **Upload Data** page is available at `/upload` within the client application:
+- **Role-Based Access:** Accessible to `analyst` and `supervisor` users; hidden from `admin` users in the navigation bar.
+- **Client-Side Validation:** Accepts `.csv` files up to 5 MB with instant validation and error notices.
+- **Dry Run Previews & Reports:** Clicking **Check file** executes a dry-run analysis and displays:
+  - Metric cards: Total rows, valid count, rejected count, duplicate count.
+  - Column matching table showing CSV headers mapped to canonical fields, plus ignored headers.
+  - Preview table of the first 20 valid rows.
+  - Line-by-line rejected rows table with specific validation error messages.
+- **Interactive Column Mapping:** If required canonical columns are missing, an interactive mapping panel lets users map unrecognised headers to standard fields (`account_id`, `amount`, `currency`, `merchant`, `transaction_type`, `region`, `timestamp`) and re-run validation.
+- **Controlled Ingestion:** The **Import valid rows** action is enabled only when valid rows exist. Upon successful import, a batch summary displays saved, rejected, and duplicate totals with the batch ID and a direct link to the Dashboard filtered by `source=uploaded`.
+- **Source Filtering:** The Dashboard transactions table includes a Source filter (`All`, `Demo`, `Uploaded`) and an "Uploaded" badge for ingested batches.
+
 ---
 
 ## Documentation Directory

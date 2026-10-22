@@ -225,36 +225,41 @@ export const ReportsPage = () => {
 
       {/* KPI Cards */}
       {summary && (
-        <div className="stats-grid" style={{ marginBottom: '1.5rem' }}>
-          <StatCard
-            title="Total Ingest Volume"
-            value={summary.total_transactions.toLocaleString()}
-            subtext={`Total Value: ₹${(summary.total_amount || 0).toLocaleString('en-IN')}`}
-            icon={TrendingUp}
-            color="indigo"
-          />
-          <StatCard
-            title="Flagged Transactions"
-            value={summary.flagged_transactions}
-            subtext={`Flagged Rate: ${(summary.flagged_rate * 100).toFixed(2)}%`}
-            icon={AlertTriangle}
-            color="amber"
-          />
-          <StatCard
-            title="Avg Risk Score"
-            value={summary.average_risk_score}
-            subtext="Calculated across all transactions"
-            icon={BarChart3}
-            color="emerald"
-          />
-          <StatCard
-            title="Investigating Cases"
-            value={summary.cases_by_status ? summary.cases_by_status.investigating : 0}
-            subtext={`Resolved: ${summary.cases_by_status ? summary.cases_by_status.resolved : 0}`}
-            icon={FileText}
-            color="blue"
-          />
-        </div>
+        <>
+          <div className="stats-grid" style={{ marginBottom: '0.5rem' }}>
+            <StatCard
+              title="Total Ingest Volume"
+              value={summary.total_transactions.toLocaleString()}
+              subtext={`Total Value: ₹${(summary.total_amount || 0).toLocaleString('en-IN')}`}
+              icon={TrendingUp}
+              color="indigo"
+            />
+            <StatCard
+              title="Flagged Transactions"
+              value={summary.flagged_transactions}
+              subtext={`Flagged Rate: ${(summary.flagged_rate * 100).toFixed(2)}%`}
+              icon={AlertTriangle}
+              color="amber"
+            />
+            <StatCard
+              title="Avg Risk Score"
+              value={summary.average_risk_score}
+              subtext="Calculated across all transactions"
+              icon={BarChart3}
+              color="emerald"
+            />
+            <StatCard
+              title="Investigating Cases"
+              value={summary.cases_by_status ? summary.cases_by_status.investigating : 0}
+              subtext={`Resolved: ${summary.cases_by_status ? summary.cases_by_status.resolved : 0}`}
+              icon={FileText}
+              color="blue"
+            />
+          </div>
+          <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '1.5rem', fontStyle: 'italic' }}>
+            Totals add amounts as recorded; no currency conversion.
+          </div>
+        </>
       )}
 
       {/* Recharts Data Visualization Grid */}

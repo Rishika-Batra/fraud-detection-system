@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { transactionService } from '../services/transactionService';
 import { RiskBadge } from '../components/ui/RiskBadge';
 import { StatCard } from '../components/ui/StatCard';
+import { formatMoney } from '../utils/formatters';
 import { useAuth } from '../context/AuthContext';
 import {
   Search,
@@ -31,6 +32,7 @@ const SAMPLE_TRANSACTIONS = [
 export const DashboardPage = () => {
   const { hasRole } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   const [transactions, setTransactions] = useState([]);
   const [totalCount, setTotalCount] = useState(0);
@@ -44,6 +46,7 @@ export const DashboardPage = () => {
   const [regionFilter, setRegionFilter] = useState('');
   const [typeFilter, setTypeFilter] = useState('');
   const [flaggedFilter, setFlaggedFilter] = useState('');
+  const [sourceFilter, setSourceFilter] = useState(searchParams.get('source') || '');
   const [sortBy, setSortBy] = useState('risk_score');
   const [sortOrder, setSortOrder] = useState('DESC');
   const [page, setPage] = useState(1);
@@ -77,6 +80,7 @@ export const DashboardPage = () => {
         region: regionFilter || undefined,
         transaction_type: typeFilter || undefined,
         is_flagged: flaggedFilter !== '' ? flaggedFilter === 'true' : undefined,
+        source: sourceFilter || undefined,
         account_id: searchQuery ? searchQuery.trim() : undefined,
       };
 
@@ -92,6 +96,7 @@ export const DashboardPage = () => {
       if (regionFilter) filtered = filtered.filter(t => t.region === regionFilter);
       if (typeFilter) filtered = filtered.filter(t => t.transaction_type === typeFilter);
       if (flaggedFilter !== '') filtered = filtered.filter(t => t.is_flagged === (flaggedFilter === 'true'));
+      if (sourceFilter) filtered = filtered.filter(t => (t.source || 'demo') === sourceFilter);
       if (searchQuery) filtered = filtered.filter(t => t.account_id.toLowerCase().includes(searchQuery.toLowerCase()));
 
       setTransactions(filtered);
@@ -105,7 +110,7 @@ export const DashboardPage = () => {
 
   useEffect(() => {
     fetchTransactions();
-  }, [page, riskLevel, regionFilter, typeFilter, flaggedFilter, sortBy, sortOrder]);
+  }, [page, riskLevel, regionFilter, typeFilter, flaggedFilter, sourceFilter, sortBy, sortOrder]);
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
@@ -205,6 +210,9 @@ export const DashboardPage = () => {
           color={avgRiskScore > 50 ? 'rose' : 'emerald'}
         />
       </div>
+      <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.5rem', marginBottom: '1rem', fontStyle: 'italic' }}>
+        Totals add amounts as recorded; no currency conversion.
+      </div>
 
       {/* Controls & Search Bar */}
       <div className="glass-card controls-card" style={{ marginTop: '1.5rem', marginBottom: '1.5rem' }}>
@@ -252,6 +260,15 @@ export const DashboardPage = () => {
               <option value="">All Statuses</option>
               <option value="true">Flagged Only</option>
               <option value="false">Unflagged Only</option>
+            </select>
+          </div>
+
+          <div className="filter-item">
+            <label className="form-label">Source</label>
+            <select className="select" value={sourceFilter} onChange={(e) => { setSourceFilter(e.target.value); setPage(1); }}>
+              <option value="">All</option>
+              <option value="demo">Demo</option>
+              <option value="uploaded">Uploaded</option>
             </select>
           </div>
 
@@ -327,16 +344,32 @@ export const DashboardPage = () => {
                   <tr key={tx.id}>
                     <td className="mono" style={{ fontWeight: 600, color: 'var(--primary)' }}>
                       #{tx.id}
+                      {tx.source === 'uploaded' && (
+                        <span
+                          className="badge badge-uploaded"
+                          style={{
+                            marginLeft: '0.4rem',
+                            fontSize: '0.65rem',
+                            padding: '0.15rem 0.4rem',
+                            backgroundColor: 'rgba(56, 189, 248, 0.15)',
+                            color: '#38bdf8',
+                            border: '1px solid rgba(56, 189, 248, 0.3)',
+                            borderRadius: '4px',
+                            fontWeight: 600,
+                            verticalAlign: 'middle',
+                            display: 'inline-block'
+                          }}
+                        >
+                          Uploaded
+                        </span>
+                      )}
                     </td>
                     <td>
                       <span className="mono" style={{ fontWeight: 600 }}>{tx.account_id}</span>
                     </td>
                     <td>
                       <span style={{ fontWeight: 700, fontSize: '0.95rem' }}>
-                        ₹{Number(tx.amount).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
-                      </span>
-                      <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginLeft: '0.3rem' }}>
-                        {tx.currency}
+                        {formatMoney(tx.amount, tx.currency)}
                       </span>
                     </td>
                     <td>{tx.merchant || <span style={{ color: 'var(--text-dim)' }}>—</span>}</td>
@@ -425,7 +458,7 @@ export const DashboardPage = () => {
                 <div>
                   <label className="form-label">Amount & Currency</label>
                   <div style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--primary)' }}>
-                    ₹{Number(selectedTx.amount).toLocaleString('en-IN', { minimumFractionDigits: 2 })} {selectedTx.currency}
+                    {formatMoney(selectedTx.amount, selectedTx.currency)}
                   </div>
                 </div>
                 <div>

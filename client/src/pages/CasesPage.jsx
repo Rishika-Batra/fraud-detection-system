@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { caseService } from '../services/caseService';
 import { StatusBadge } from '../components/ui/StatusBadge';
 import { RiskBadge } from '../components/ui/RiskBadge';
+import { formatMoney } from '../utils/formatters';
 import {
   Briefcase,
   Search,
@@ -197,7 +198,7 @@ export const CasesPage = () => {
                     <td>
                       {c.transaction ? (
                         <span style={{ fontWeight: 700 }}>
-                          ₹{Number(c.transaction.amount).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                          {formatMoney(c.transaction.amount, c.transaction.currency)}
                         </span>
                       ) : (
                         <span style={{ color: 'var(--text-dim)' }}>—</span>
