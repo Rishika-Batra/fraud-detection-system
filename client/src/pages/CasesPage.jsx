@@ -16,35 +16,6 @@ import {
   Flag,
 } from 'lucide-react';
 
-const SAMPLE_CASES = [
-  {
-    id: 1,
-    transaction_id: 101,
-    status: 'flagged',
-    assigned_to: null,
-    created_at: new Date(Date.now() - 3600000).toISOString(),
-    transaction: { id: 101, amount: 48500.00, currency: 'INR', risk_score: 88, risk_level: 'high', region: 'IN-WEST' }
-  },
-  {
-    id: 2,
-    transaction_id: 104,
-    status: 'investigating',
-    assigned_to: 1,
-    assignee: { username: 'rishika_analyst' },
-    created_at: new Date(Date.now() - 14400000).toISOString(),
-    transaction: { id: 104, amount: 75200.00, currency: 'INR', risk_score: 92, risk_level: 'high', region: 'IN-WEST' }
-  },
-  {
-    id: 3,
-    transaction_id: 109,
-    status: 'escalated',
-    assigned_to: 2,
-    assignee: { username: 'supervisor_raj' },
-    created_at: new Date(Date.now() - 86400000).toISOString(),
-    transaction: { id: 109, amount: 120000.00, currency: 'INR', risk_score: 96, risk_level: 'high', region: 'IN-SOUTH' }
-  }
-];
-
 export const CasesPage = () => {
   const navigate = useNavigate();
   const [cases, setCases] = useState([]);
@@ -68,12 +39,18 @@ export const CasesPage = () => {
       const list = res?.data || res?.rows || (Array.isArray(res) ? res : []);
       setCases(list);
     } catch (err) {
-      console.warn('Backend cases fetch error, fallback to sample cases:', err);
-      let filtered = [...SAMPLE_CASES];
-      if (activeTab) filtered = filtered.filter(c => c.status === activeTab);
-      if (riskFilter) filtered = filtered.filter(c => c.transaction && c.transaction.risk_level === riskFilter);
-      setCases(filtered);
-      setError(`Backend case service notice: ${err.message}`);
+      if (err.status === 401) {
+        navigate('/login');
+        return;
+      }
+      setCases([]);
+      let msg = err.message || 'Failed to load cases.';
+      if (err.status === 403) {
+        msg = 'You do not have access to this case';
+      } else if (err.status === 404) {
+        msg = 'Case not found';
+      }
+      setError(msg);
     } finally {
       setLoading(false);
     }
@@ -86,9 +63,12 @@ export const CasesPage = () => {
   return (
     <div className="cases-page">
       {error && (
-        <div className="alert alert-info">
+        <div className="alert alert-error" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.5rem' }}>
           <AlertTriangle size={18} />
           <span>{error}</span>
+          <button className="btn btn-secondary btn-sm" onClick={fetchCases} style={{ marginLeft: 'auto' }}>
+            Try again
+          </button>
         </div>
       )}
 
@@ -177,6 +157,16 @@ export const CasesPage = () => {
                   <td colSpan={8} style={{ textAlign: 'center', padding: '3rem' }}>
                     <RefreshCw className="spin" size={28} style={{ color: 'var(--primary)', marginBottom: '0.5rem' }} />
                     <p style={{ color: 'var(--text-muted)' }}>Loading active case files...</p>
+                  </td>
+                </tr>
+              ) : error ? (
+                <tr>
+                  <td colSpan={8} style={{ textAlign: 'center', padding: '3rem' }}>
+                    <AlertTriangle size={32} style={{ color: 'var(--risk-high)', marginBottom: '0.5rem' }} />
+                    <p style={{ fontSize: '1rem', color: 'var(--text-main)', marginBottom: '1rem' }}>{error}</p>
+                    <button className="btn btn-primary btn-sm" onClick={fetchCases}>
+                      Try again
+                    </button>
                   </td>
                 </tr>
               ) : cases.length === 0 ? (

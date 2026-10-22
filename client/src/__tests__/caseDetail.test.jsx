@@ -167,4 +167,77 @@ describe('CaseDetailPage', () => {
       screen.queryByRole('button', { name: /start investigation/i })
     ).not.toBeInTheDocument();
   });
+
+  it('shows friendly error for 404 and allows retry', async () => {
+    const error404 = new Error('Not found');
+    error404.status = 404;
+    caseService.getCaseById.mockRejectedValueOnce(error404);
+
+    renderCaseDetail(999);
+
+    expect(await screen.findByText('Case not found')).toBeInTheDocument();
+    const retryBtn = screen.getByRole('button', { name: /try again/i });
+    expect(retryBtn).toBeInTheDocument();
+
+    // Verify retry calls getCaseById again
+    caseService.getCaseById.mockResolvedValueOnce({
+      ...mockCase,
+      id: 999,
+    });
+    fireEvent.click(retryBtn);
+
+    expect(await screen.findByText('Case Workspace #999')).toBeInTheDocument();
+  });
+
+  it('shows friendly error for 403 forbidden access', async () => {
+    const error403 = new Error('Forbidden');
+    error403.status = 403;
+    caseService.getCaseById.mockRejectedValue(error403);
+
+    renderCaseDetail(42);
+
+    expect(await screen.findByText('You do not have access to this case')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /try again/i })).toBeInTheDocument();
+  });
+
+  it('shows error message when an action fails and does not pretend it succeeded', async () => {
+    caseService.getCaseById.mockResolvedValue(mockCase);
+    caseService.updateStatus.mockRejectedValue(new Error('State transition rejected by workflow policy'));
+
+    renderCaseDetail(1);
+
+    const startInvestigationBtn = await screen.findByRole('button', {
+      name: /start investigation/i,
+    });
+    fireEvent.click(startInvestigationBtn);
+
+    expect(
+      await screen.findByText('State transition rejected by workflow policy')
+    ).toBeInTheDocument();
+    // Status must remain flagged, not updated to investigating
+    expect(screen.getByText('flagged')).toBeInTheDocument();
+    expect(screen.queryByText(/Case workflow status updated to/i)).not.toBeInTheDocument();
+  });
+
+  it('shows error message when adding a note fails', async () => {
+    caseService.getCaseById.mockResolvedValue(mockCase);
+    caseService.addNote.mockRejectedValue(new Error('Failed to append investigation note'));
+
+    renderCaseDetail(1);
+
+    await screen.findByText('Case Workspace #1');
+
+    const textarea = screen.getByPlaceholderText(/enter investigation note/i);
+    fireEvent.change(textarea, { target: { value: 'Synthetic audit log note test' } });
+
+    const submitBtn = screen.getByRole('button', { name: /log note/i });
+    fireEvent.click(submitBtn);
+
+    expect(
+      await screen.findByText('Failed to append investigation note')
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByText('Investigation note logged to audit trail.')
+    ).not.toBeInTheDocument();
+  });
 });

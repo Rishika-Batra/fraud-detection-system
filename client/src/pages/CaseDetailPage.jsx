@@ -52,34 +52,18 @@ export const CaseDetailPage = () => {
         setSelectedAssignee(data.assigned_to);
       }
     } catch (err) {
-      console.warn('API error fetching case detail, using mock:', err);
-      // Fallback mock detail for testing offline
-      setCaseData({
-        id: parseInt(id),
-        transaction_id: 101,
-        assigned_to: user?.id || 1,
-        status: 'investigating',
-        created_at: new Date(Date.now() - 3600000).toISOString(),
-        assignee: { id: 1, username: user?.username || 'rishika_analyst', role: user?.role || 'analyst' },
-        transaction: {
-          id: 101,
-          account_id: 'ACC-88392',
-          amount: 48500.00,
-          currency: 'INR',
-          merchant: 'CryptoX Exchange',
-          transaction_type: 'transfer',
-          region: 'IN-WEST',
-          timestamp: new Date(Date.now() - 3600000).toISOString(),
-          risk_score: 88,
-          risk_level: 'high',
-          risk_factors: ['High amount for account profile', 'Unusual location region', 'Rapid velocity transfer']
-        },
-        CaseNotes: [
-          { id: 1, note: 'Initial automated flag triggered by scoring engine rule #4 (Amount > threshold).', created_at: new Date(Date.now() - 3500000).toISOString(), author: { username: 'System Engine' } },
-          { id: 2, note: 'Opened investigation. Verification request sent to cardholder account manager.', created_at: new Date(Date.now() - 1800000).toISOString(), author: { username: user?.username || 'rishika_analyst' } }
-        ]
-      });
-      setError(`Notice: Operating with cached case workspace (${err.message})`);
+      if (err.status === 401) {
+        navigate('/login');
+        return;
+      }
+      setCaseData(null);
+      let msg = err.message || 'Failed to load case details.';
+      if (err.status === 404) {
+        msg = 'Case not found';
+      } else if (err.status === 403) {
+        msg = 'You do not have access to this case';
+      }
+      setError(msg);
     } finally {
       setLoading(false);
     }
@@ -91,7 +75,12 @@ export const CaseDetailPage = () => {
         const users = await authService.getUsers();
         setUserList(Array.isArray(users) ? users : (users?.data || users?.rows || []));
       } catch (err) {
+        if (err.status === 401) {
+          navigate('/login');
+          return;
+        }
         console.warn('Could not fetch user list for reassign:', err);
+        setError(err.message || 'Failed to load user list for reassignment');
       }
     }
   };
@@ -110,6 +99,10 @@ export const CaseDetailPage = () => {
       setSuccessMsg(`Case workflow status updated to "${nextStatus.toUpperCase()}" successfully.`);
       await fetchCaseDetails();
     } catch (err) {
+      if (err.status === 401) {
+        navigate('/login');
+        return;
+      }
       setError(err.message || `Failed to update status to ${nextStatus}`);
     } finally {
       setTransitioning(false);
@@ -129,6 +122,10 @@ export const CaseDetailPage = () => {
       setSuccessMsg('Investigation note logged to audit trail.');
       await fetchCaseDetails();
     } catch (err) {
+      if (err.status === 401) {
+        navigate('/login');
+        return;
+      }
       setError(err.message || 'Failed to add note');
     } finally {
       setSubmittingNote(false);
@@ -145,6 +142,10 @@ export const CaseDetailPage = () => {
       setSuccessMsg(`Case assigned to user ID #${selectedAssignee} successfully.`);
       await fetchCaseDetails();
     } catch (err) {
+      if (err.status === 401) {
+        navigate('/login');
+        return;
+      }
       setError(err.message || 'Failed to reassign case');
     } finally {
       setAssigning(false);
@@ -162,12 +163,19 @@ export const CaseDetailPage = () => {
 
   if (!caseData) {
     return (
-      <div className="alert alert-error">
-        <AlertTriangle size={18} />
-        <span>Case #{id} could not be loaded. Please return to the Case Desk.</span>
-        <button className="btn btn-secondary btn-sm" onClick={() => navigate('/cases')} style={{ marginLeft: 'auto' }}>
-          Back to Cases
-        </button>
+      <div style={{ padding: '2rem' }}>
+        <div className="alert alert-error" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
+          <AlertTriangle size={18} />
+          <span>{error || `Case #${id} could not be loaded.`}</span>
+          <div style={{ marginLeft: 'auto', display: 'flex', gap: '0.5rem' }}>
+            <button className="btn btn-primary btn-sm" onClick={fetchCaseDetails}>
+              Try again
+            </button>
+            <button className="btn btn-secondary btn-sm" onClick={() => navigate('/cases')}>
+              Back to Cases
+            </button>
+          </div>
+        </div>
       </div>
     );
   }
