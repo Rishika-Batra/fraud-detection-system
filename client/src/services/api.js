@@ -6,8 +6,9 @@ const BASE_URL = '/api';
 
 export async function request(endpoint, options = {}) {
   const token = localStorage.getItem('sentinel_token');
+  const isFormData = options.body instanceof FormData;
   const headers = {
-    'Content-Type': 'application/json',
+    ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
     ...options.headers,
   };
@@ -17,7 +18,7 @@ export async function request(endpoint, options = {}) {
     headers,
   };
 
-  if (config.body && typeof config.body === 'object' && !(config.body instanceof FormData)) {
+  if (config.body && typeof config.body === 'object' && !isFormData) {
     config.body = JSON.stringify(config.body);
   }
 
@@ -42,7 +43,9 @@ export async function request(endpoint, options = {}) {
     const errorMsg = data.error || data.message || `Request failed with status ${response.status}`;
     const err = new Error(errorMsg);
     err.status = response.status;
+    err.error = data.error || null;
     err.details = data.details || null;
+    err.columns = data.columns || null;
     throw err;
   }
 

@@ -8,6 +8,7 @@ import { CasesPage } from './pages/CasesPage';
 import { CaseDetailPage } from './pages/CaseDetailPage';
 import { ReportsPage } from './pages/ReportsPage';
 import { AuditLogsPage } from './pages/AuditLogsPage';
+import { UploadPage } from './pages/UploadPage';
 
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
@@ -47,6 +48,7 @@ export const App = () => {
             <Route path="cases" element={<CasesPage />} />
             <Route path="cases/:id" element={<CaseDetailPage />} />
             <Route path="reports" element={<ReportsPage />} />
+            <Route path="upload" element={<UploadPage />} />
             <Route path="audit" element={<AuditLogsPage />} />
           </Route>
 

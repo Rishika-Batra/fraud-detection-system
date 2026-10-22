@@ -5,6 +5,7 @@ import { authService } from '../services/authService';
 import { useAuth } from '../context/AuthContext';
 import { StatusBadge } from '../components/ui/StatusBadge';
 import { RiskBadge } from '../components/ui/RiskBadge';
+import { formatMoney } from '../utils/formatters';
 import {
   Briefcase,
   ArrowLeft,
@@ -343,7 +344,7 @@ export const CaseDetailPage = () => {
                   <div>
                     <label className="form-label">Amount</label>
                     <div style={{ fontSize: '1.15rem', fontWeight: 800, color: '#fff' }}>
-                      ₹{Number(transaction.amount).toLocaleString('en-IN', { minimumFractionDigits: 2 })} {transaction.currency}
+                      {formatMoney(transaction.amount, transaction.currency)}
                     </div>
                   </div>
                   <div>

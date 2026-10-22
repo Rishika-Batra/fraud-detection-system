@@ -13,6 +13,7 @@ import {
   X,
   AlertTriangle,
   CheckCircle2,
+  UploadCloud,
 } from 'lucide-react';
 
 export const AppLayout = () => {
@@ -34,6 +35,8 @@ export const AppLayout = () => {
         return { title: 'Case Management', subtitle: 'FR-09 Fraud Investigation & Workflow Desk' };
       case '/reports':
         return { title: 'Analytics & Intelligence', subtitle: 'FR-10 Risk Trends, Heatmaps & Reports' };
+      case '/upload':
+        return { title: 'Upload Data', subtitle: 'CSV Bulk Transaction Ingestion & Validation' };
       case '/audit':
         return { title: 'Audit Trail', subtitle: 'System Activity & Security Logging' };
       default:
@@ -99,6 +102,17 @@ export const AppLayout = () => {
             <BarChart3 size={20} />
             <span>Analytics (FR-10)</span>
           </NavLink>
+
+          {hasRole('analyst', 'supervisor') && (
+            <NavLink
+              to="/upload"
+              className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
+              onClick={() => setSidebarOpen(false)}
+            >
+              <UploadCloud size={20} />
+              <span>Upload Data</span>
+            </NavLink>
+          )}
 
           {hasRole('admin', 'supervisor') && (
             <NavLink
