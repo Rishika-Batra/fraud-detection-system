@@ -1,0 +1,13 @@
+Acct,Amt,Ccy,Vendor,Type,Country,Date,Notes
+SYN-ACC-2001,1200.50,inr,City Pharmacy,Purchase,North,2026-10-01 09:15:00,lowercase currency is fixed automatically
+SYN-ACC-2002,"1,25,000.00",INR,Global Electronics Hub,transfer,West,2026-10-03T22:40:00Z,amount with thousands separators
+SYN-ACC-2003,45.00,USD,Streaming Service,purchase,South,2026-10-05,date without a time
+SYN-ACC-2004,8000.00,INR,Rent Payment,transfer,East,2026-10-07 07:30:00,
+SYN-ACC-2005,-50.00,INR,Refund Test,purchase,North,2026-10-08 12:00:00,negative amount is rejected
+SYN-ACC-2006,300.00,RUPEES,Corner Store,purchase,South,2026-10-09 18:20:00,bad currency code is rejected
+SYN-ACC-2007,2500.00,INR,Fuel Station,purchase,West,04/10/2026,ambiguous date format is rejected
+SYN-ACC-2008,950.00,INR,Online Bookshop,gift,North,2026-10-12 15:05:00,unknown transaction type is rejected
+SYN-ACC-2009,350000.00,INR,Offshore Luxury Goods,withdrawal,East,2026-10-14 03:10:00,large night withdrawal
+SYN-ACC-2010,60.25,EUR,Cafe Roma,purchase,North,2026-10-16 10:45:00,
+SYN-ACC-2001,1200.50,INR,City Pharmacy,purchase,North,2026-10-01 09:15:00,duplicate of the first row is skipped
+SYN-ACC-2012,15000.00,INR,Payroll Direct,deposit,East,2026-10-20 09:00:00,
