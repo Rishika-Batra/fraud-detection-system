@@ -157,4 +157,70 @@ describe('DashboardPage', () => {
       expect.objectContaining({ is_flagged: false })
     );
   });
+
+  it('shows error message and Try again button when fetch fails and NO fake transactions appear', async () => {
+    transactionService.getTransactions.mockRejectedValue(
+      new Error('Database cluster connection failure')
+    );
+
+    renderDashboard();
+
+    const errorElements = await screen.findAllByText('Database cluster connection failure');
+    expect(errorElements.length).toBeGreaterThanOrEqual(1);
+
+    const tryAgainBtns = screen.getAllByRole('button', { name: /try again/i });
+    expect(tryAgainBtns.length).toBeGreaterThanOrEqual(1);
+
+    // Verify NO sample rows appear
+    expect(screen.queryByText('ACC-88392')).not.toBeInTheDocument();
+    expect(screen.queryByText('ACC-44910')).not.toBeInTheDocument();
+    expect(screen.queryByText('CryptoX Exchange')).not.toBeInTheDocument();
+    expect(screen.queryByText('Luxury Watches Ltd')).not.toBeInTheDocument();
+    expect(screen.queryByText('FreshMart Superstore')).not.toBeInTheDocument();
+
+    // Verify clicking Try again refetches
+    transactionService.getTransactions.mockResolvedValueOnce({
+      data: mockTransactions,
+      count: mockTransactions.length,
+    });
+    fireEvent.click(tryAgainBtns[0]);
+
+    expect(await screen.findByText('ACC-88392')).toBeInTheDocument();
+  });
+
+  it('shows empty state when API succeeds with zero transactions', async () => {
+    transactionService.getTransactions.mockResolvedValue({
+      data: [],
+      count: 0,
+    });
+
+    renderDashboard();
+
+    expect(
+      await screen.findByText('No transactions found matching your criteria.')
+    ).toBeInTheDocument();
+    expect(screen.queryByText('ACC-88392')).not.toBeInTheDocument();
+  });
+
+  it('shows error message when flag transaction action fails', async () => {
+    transactionService.getTransactions.mockResolvedValue({
+      data: mockTransactions,
+      count: mockTransactions.length,
+    });
+    transactionService.flagTransaction.mockRejectedValue(
+      new Error('Transaction lock acquisition timeout')
+    );
+
+    renderDashboard();
+
+    expect(await screen.findByText('ACC-44910')).toBeInTheDocument();
+
+    // Find flag action button for unflagged transaction ACC-44910
+    const flagBtn = screen.getByTitle('Flag for Investigation (FR-09)');
+    fireEvent.click(flagBtn);
+
+    expect(
+      await screen.findByText('Transaction lock acquisition timeout')
+    ).toBeInTheDocument();
+  });
 });
