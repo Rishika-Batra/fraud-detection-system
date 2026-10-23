@@ -21,14 +21,6 @@ import {
   ExternalLink,
 } from 'lucide-react';
 
-const SAMPLE_TRANSACTIONS = [
-  { id: 101, account_id: 'ACC-88392', amount: 48500.00, currency: 'INR', merchant: 'CryptoX Exchange', transaction_type: 'transfer', region: 'IN-WEST', timestamp: new Date(Date.now() - 3600000).toISOString(), risk_score: 88, risk_level: 'high', risk_factors: ['High amount for account profile', 'Unusual region location', 'High velocity transfer'], is_flagged: true },
-  { id: 102, account_id: 'ACC-44910', amount: 1240.50, currency: 'INR', merchant: 'TechGear Store', transaction_type: 'purchase', region: 'IN-NORTH', timestamp: new Date(Date.now() - 7200000).toISOString(), risk_score: 22, risk_level: 'low', risk_factors: [], is_flagged: false },
-  { id: 103, account_id: 'ACC-91204', amount: 19800.00, currency: 'INR', merchant: 'Global Pay Wire', transaction_type: 'withdrawal', region: 'IN-SOUTH', timestamp: new Date(Date.now() - 10800000).toISOString(), risk_score: 65, risk_level: 'medium', risk_factors: ['Multiple rapid withdrawals'], is_flagged: false },
-  { id: 104, account_id: 'ACC-12093', amount: 75200.00, currency: 'INR', merchant: 'Luxury Watches Ltd', transaction_type: 'purchase', region: 'IN-WEST', timestamp: new Date(Date.now() - 14400000).toISOString(), risk_score: 92, risk_level: 'high', risk_factors: ['High amount purchase', 'First time merchant'], is_flagged: true },
-  { id: 105, account_id: 'ACC-67482', amount: 350.00, currency: 'INR', merchant: 'FreshMart Superstore', transaction_type: 'purchase', region: 'IN-EAST', timestamp: new Date(Date.now() - 18000000).toISOString(), risk_score: 12, risk_level: 'low', risk_factors: [], is_flagged: false },
-];
-
 export const DashboardPage = () => {
   const { hasRole } = useAuth();
   const navigate = useNavigate();
@@ -38,7 +30,6 @@ export const DashboardPage = () => {
   const [totalCount, setTotalCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [usingSampleData, setUsingSampleData] = useState(false);
 
   // Filters & Pagination State
   const [searchQuery, setSearchQuery] = useState('');
@@ -88,21 +79,20 @@ export const DashboardPage = () => {
       const list = res?.data || res?.rows || (Array.isArray(res) ? res : []);
       setTransactions(list);
       setTotalCount(res?.pagination?.total ?? res?.count ?? list.length);
-      setUsingSampleData(false);
     } catch (err) {
-      console.warn('API error, switching to fallback sample feed:', err.message);
-      let filtered = [...SAMPLE_TRANSACTIONS];
-      if (riskLevel) filtered = filtered.filter(t => t.risk_level === riskLevel);
-      if (regionFilter) filtered = filtered.filter(t => t.region === regionFilter);
-      if (typeFilter) filtered = filtered.filter(t => t.transaction_type === typeFilter);
-      if (flaggedFilter !== '') filtered = filtered.filter(t => t.is_flagged === (flaggedFilter === 'true'));
-      if (sourceFilter) filtered = filtered.filter(t => (t.source || 'demo') === sourceFilter);
-      if (searchQuery) filtered = filtered.filter(t => t.account_id.toLowerCase().includes(searchQuery.toLowerCase()));
-
-      setTransactions(filtered);
-      setTotalCount(filtered.length);
-      setUsingSampleData(true);
-      setError(`Backend connected with sample mode (${err.message})`);
+      if (err.status === 401) {
+        navigate('/login');
+        return;
+      }
+      setTransactions([]);
+      setTotalCount(0);
+      let msg = err.message || 'Failed to load transactions.';
+      if (err.status === 403) {
+        msg = 'You do not have access to view transactions';
+      } else if (err.status === 404) {
+        msg = 'Transactions not found';
+      }
+      setError(msg);
     } finally {
       setLoading(false);
     }
@@ -130,6 +120,10 @@ export const DashboardPage = () => {
         setSelectedTx(prev => ({ ...prev, is_flagged: true }));
       }
     } catch (err) {
+      if (err.status === 401) {
+        navigate('/login');
+        return;
+      }
       setActionMessage({ type: 'error', text: err.message || 'Failed to flag transaction' });
     } finally {
       setFlagging(false);
@@ -147,7 +141,11 @@ export const DashboardPage = () => {
       setActionMessage({ type: 'success', text: 'Simulated transaction ingested and scored successfully!' });
       fetchTransactions();
     } catch (err) {
-      alert('Ingest error: ' + err.message);
+      if (err.status === 401) {
+        navigate('/login');
+        return;
+      }
+      setActionMessage({ type: 'error', text: err.message || 'Failed to ingest transaction' });
     }
   };
 
@@ -159,13 +157,13 @@ export const DashboardPage = () => {
 
   return (
     <div className="dashboard-page">
-      {/* Sample mode alert banner */}
-      {usingSampleData && (
-        <div className="alert alert-info">
+      {error && (
+        <div className="alert alert-error" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.5rem' }}>
           <AlertTriangle size={18} />
-          <span>
-            <strong>Simulated Data Active:</strong> Backend service unreachable. Presenting structured fallback transaction feed.
-          </span>
+          <span>{error}</span>
+          <button className="btn btn-secondary btn-sm" onClick={fetchTransactions} style={{ marginLeft: 'auto' }}>
+            Try again
+          </button>
         </div>
       )}
 
@@ -331,6 +329,16 @@ export const DashboardPage = () => {
                   <td colSpan={8} style={{ textAlign: 'center', padding: '3rem' }}>
                     <RefreshCw className="spin" size={28} style={{ color: 'var(--primary)', marginBottom: '0.5rem' }} />
                     <p style={{ color: 'var(--text-muted)' }}>Loading real-time transactions...</p>
+                  </td>
+                </tr>
+              ) : error ? (
+                <tr>
+                  <td colSpan={8} style={{ textAlign: 'center', padding: '3rem' }}>
+                    <AlertTriangle size={32} style={{ color: 'var(--risk-high)', marginBottom: '0.5rem' }} />
+                    <p style={{ fontSize: '1rem', color: 'var(--text-main)', marginBottom: '1rem' }}>{error}</p>
+                    <button className="btn btn-primary btn-sm" onClick={fetchTransactions}>
+                      Try again
+                    </button>
                   </td>
                 </tr>
               ) : transactions.length === 0 ? (

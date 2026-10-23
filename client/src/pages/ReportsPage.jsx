@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { reportService } from '../services/reportService';
 import { useAuth } from '../context/AuthContext';
 import { StatCard } from '../components/ui/StatCard';
@@ -25,45 +26,19 @@ import {
   FileSpreadsheet,
   FileText,
   Lock,
+  X,
 } from 'lucide-react';
-
-const SAMPLE_SUMMARY = {
-  total_transactions: 1420,
-  total_amount: 4850000.00,
-  flagged_transactions: 118,
-  flagged_rate: 0.0831,
-  average_risk_score: 34.5,
-  by_risk_level: { low: 1100, medium: 202, high: 118 },
-  cases_by_status: { flagged: 32, investigating: 45, resolved: 28, escalated: 8, closed: 5 }
-};
-
-const SAMPLE_TRENDS = [
-  { period: '2026-10-04', total: 180, flagged: 12, high_risk: 10, average_risk_score: 28.4 },
-  { period: '2026-10-05', total: 210, flagged: 18, high_risk: 15, average_risk_score: 32.1 },
-  { period: '2026-10-06', total: 195, flagged: 14, high_risk: 12, average_risk_score: 30.0 },
-  { period: '2026-10-07', total: 240, flagged: 22, high_risk: 20, average_risk_score: 38.6 },
-  { period: '2026-10-08', total: 220, flagged: 19, high_risk: 18, average_risk_score: 35.2 },
-  { period: '2026-10-09', total: 260, flagged: 28, high_risk: 25, average_risk_score: 41.0 },
-  { period: '2026-10-10', total: 115, flagged: 5, high_risk: 8, average_risk_score: 29.5 },
-];
-
-const SAMPLE_HEATMAP = [
-  { region: 'IN-WEST', transaction_type: 'transfer', count: 280, average_risk_score: 54.2 },
-  { region: 'IN-WEST', transaction_type: 'purchase', count: 410, average_risk_score: 22.8 },
-  { region: 'IN-NORTH', transaction_type: 'withdrawal', count: 190, average_risk_score: 48.5 },
-  { region: 'IN-SOUTH', transaction_type: 'transfer', count: 320, average_risk_score: 39.1 },
-  { region: 'IN-EAST', transaction_type: 'purchase', count: 220, average_risk_score: 18.4 },
-];
 
 export const ReportsPage = () => {
   const { hasRole, user } = useAuth();
+  const navigate = useNavigate();
 
   const [summary, setSummary] = useState(null);
   const [trends, setTrends] = useState([]);
   const [heatmap, setHeatmap] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [isAnalystRestricted, setIsAnalystRestricted] = useState(false);
+  const [exportError, setExportError] = useState(null);
 
   // Filters
   const [fromDate, setFromDate] = useState('');
@@ -74,7 +49,6 @@ export const ReportsPage = () => {
   const fetchReports = async () => {
     setLoading(true);
     setError(null);
-    setIsAnalystRestricted(false);
     try {
       const filterParams = {
         from: fromDate || undefined,
@@ -89,19 +63,23 @@ export const ReportsPage = () => {
       ]);
 
       setSummary(sumRes);
-      setTrends(trendRes.points || []);
-      setHeatmap(heatRes.cells || []);
+      setTrends(trendRes?.points || (Array.isArray(trendRes) ? trendRes : []));
+      setHeatmap(heatRes?.cells || (Array.isArray(heatRes) ? heatRes : []));
     } catch (err) {
-      if (err.status === 403) {
-        setIsAnalystRestricted(true);
-        setError('Supervisor/Admin authorization required for live report APIs.');
-      } else {
-        setError(`Live report API notice: ${err.message}`);
+      if (err.status === 401) {
+        navigate('/login');
+        return;
       }
-      // Fallback presentation mode
-      setSummary(SAMPLE_SUMMARY);
-      setTrends(SAMPLE_TRENDS);
-      setHeatmap(SAMPLE_HEATMAP);
+      setSummary(null);
+      setTrends([]);
+      setHeatmap([]);
+      let msg = err.message || 'Failed to load report analytics.';
+      if (err.status === 403) {
+        msg = 'You do not have access to view reports';
+      } else if (err.status === 404) {
+        msg = 'Report data not found';
+      }
+      setError(msg);
     } finally {
       setLoading(false);
     }
@@ -113,10 +91,15 @@ export const ReportsPage = () => {
 
   const handleExport = async (format, type) => {
     setExporting(true);
+    setExportError(null);
     try {
       await reportService.exportData(format, type, { from: fromDate, to: toDate });
     } catch (err) {
-      alert(`Export error: ${err.message}. (Note: PDF/CSV exports require supervisor or admin authentication)`);
+      if (err.status === 401) {
+        navigate('/login');
+        return;
+      }
+      setExportError(err.message || `Failed to export ${type} report as ${format.toUpperCase()}`);
     } finally {
       setExporting(false);
     }
@@ -124,27 +107,30 @@ export const ReportsPage = () => {
 
   // Prepare chart data structures
   const riskBarData = summary ? [
-    { level: 'Low Risk', count: summary.by_risk_level.low, fill: '#10b981' },
-    { level: 'Medium Risk', count: summary.by_risk_level.medium, fill: '#f59e0b' },
-    { level: 'High Risk', count: summary.by_risk_level.high, fill: '#f43f5e' },
+    { level: 'Low Risk', count: summary.by_risk_level?.low ?? 0, fill: '#10b981' },
+    { level: 'Medium Risk', count: summary.by_risk_level?.medium ?? 0, fill: '#f59e0b' },
+    { level: 'High Risk', count: summary.by_risk_level?.high ?? 0, fill: '#f43f5e' },
   ] : [];
 
   return (
     <div className="reports-page">
-      {/* Analyst Role Warning Banner */}
-      {!hasRole('supervisor', 'admin') && (
-        <div className="alert alert-info">
-          <Lock size={18} />
-          <span>
-            <strong>Role Notice:</strong> You are logged in as <strong>{user?.username} ({user?.role})</strong>. Formal reporting APIs require Supervisor or Admin credentials. Demonstrating with live visual analytics preview.
-          </span>
+      {error && (
+        <div className="alert alert-error" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.5rem' }}>
+          <AlertTriangle size={18} />
+          <span>{error}</span>
+          <button className="btn btn-secondary btn-sm" onClick={fetchReports} style={{ marginLeft: 'auto' }}>
+            Try again
+          </button>
         </div>
       )}
 
-      {error && !isAnalystRestricted && (
-        <div className="alert alert-info">
+      {exportError && (
+        <div className="alert alert-error" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.5rem' }}>
           <AlertTriangle size={18} />
-          <span>{error}</span>
+          <span>{exportError}</span>
+          <button style={{ marginLeft: 'auto', background: 'none', border: 'none', color: 'inherit', cursor: 'pointer' }} onClick={() => setExportError(null)}>
+            <X size={16} />
+          </button>
         </div>
       )}
 
@@ -223,9 +209,27 @@ export const ReportsPage = () => {
         </div>
       </div>
 
-      {/* KPI Cards */}
-      {summary && (
+      {loading ? (
+        <div style={{ textAlign: 'center', padding: '4rem' }}>
+          <RefreshCw className="spin" size={32} style={{ color: 'var(--primary)', marginBottom: '1rem' }} />
+          <p style={{ color: 'var(--text-muted)' }}>Loading analytics and reporting data...</p>
+        </div>
+      ) : error ? (
+        <div className="glass-card" style={{ textAlign: 'center', padding: '3rem' }}>
+          <AlertTriangle size={32} style={{ color: 'var(--risk-high)', marginBottom: '0.5rem' }} />
+          <p style={{ fontSize: '1rem', color: 'var(--text-main)', marginBottom: '1rem' }}>{error}</p>
+          <button className="btn btn-primary btn-sm" onClick={fetchReports}>
+            Try again
+          </button>
+        </div>
+      ) : !summary || summary.total_transactions === 0 ? (
+        <div className="glass-card" style={{ textAlign: 'center', padding: '3rem' }}>
+          <BarChart3 size={32} style={{ color: 'var(--text-dim)', marginBottom: '0.5rem' }} />
+          <p style={{ fontSize: '1rem', color: 'var(--text-muted)' }}>No report data found for this period.</p>
+        </div>
+      ) : (
         <>
+          {/* KPI Cards */}
           <div className="stats-grid" style={{ marginBottom: '0.5rem' }}>
             <StatCard
               title="Total Ingest Volume"
@@ -259,8 +263,6 @@ export const ReportsPage = () => {
           <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '1.5rem', fontStyle: 'italic' }}>
             Totals add amounts as recorded; no currency conversion.
           </div>
-        </>
-      )}
 
       {/* Recharts Data Visualization Grid */}
       <div className="charts-grid" style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '1.5rem', marginBottom: '1.5rem' }}>
@@ -361,6 +363,8 @@ export const ReportsPage = () => {
           </table>
         </div>
       </div>
+    </>
+    )}
 
       <style>{`
         .reports-filter-bar {

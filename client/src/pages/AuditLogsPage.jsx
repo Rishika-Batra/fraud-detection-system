@@ -1,16 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { auditService } from '../services/auditService';
 import { useAuth } from '../context/AuthContext';
 import { FileText, RefreshCw, AlertTriangle, ShieldCheck, User, Clock, Lock } from 'lucide-react';
 
-const SAMPLE_LOGS = [
-  { id: 1, user_id: 1, action: 'LOGIN_SUCCESS', entity_type: 'User', entity_id: 1, details: { username: 'analyst' }, timestamp: new Date(Date.now() - 120000).toISOString(), user: { username: 'analyst' } },
-  { id: 2, user_id: 1, action: 'CASE_STATUS_UPDATED', entity_type: 'Case', entity_id: 2, details: { from: 'flagged', to: 'investigating' }, timestamp: new Date(Date.now() - 3600000).toISOString(), user: { username: 'analyst' } },
-  { id: 3, user_id: 2, action: 'REPORT_EXPORTED', entity_type: 'Report', entity_id: null, details: { type: 'cases', format: 'pdf' }, timestamp: new Date(Date.now() - 7200000).toISOString(), user: { username: 'supervisor' } },
-];
-
 export const AuditLogsPage = () => {
   const { hasRole, user } = useAuth();
+  const navigate = useNavigate();
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -23,13 +19,18 @@ export const AuditLogsPage = () => {
       const logList = Array.isArray(res) ? res : (res.data || res.rows || []);
       setLogs(logList);
     } catch (err) {
-      console.warn('Audit logs API notice:', err);
-      setLogs(SAMPLE_LOGS);
-      if (err.status === 403) {
-        setError(`Role Notice: Viewing audit logs requires Supervisor or Admin role. Currently logged in as ${user?.username} (${user?.role}).`);
-      } else {
-        setError(`Audit trail notice: ${err.message}`);
+      if (err.status === 401) {
+        navigate('/login');
+        return;
       }
+      setLogs([]);
+      let msg = err.message || 'Failed to load audit logs.';
+      if (err.status === 403) {
+        msg = 'You do not have access to view audit logs';
+      } else if (err.status === 404) {
+        msg = 'Audit logs not found';
+      }
+      setError(msg);
     } finally {
       setLoading(false);
     }
@@ -41,19 +42,13 @@ export const AuditLogsPage = () => {
 
   return (
     <div className="audit-logs-page">
-      {!hasRole('supervisor', 'admin') && (
-        <div className="alert alert-info">
-          <Lock size={18} />
-          <span>
-            <strong>Role Notice:</strong> Live Audit Logs endpoint requires Supervisor or Admin authorization. Presenting audit security preview.
-          </span>
-        </div>
-      )}
-
       {error && (
-        <div className="alert alert-info">
+        <div className="alert alert-error" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.5rem' }}>
           <AlertTriangle size={18} />
           <span>{error}</span>
+          <button className="btn btn-secondary btn-sm" onClick={fetchLogs} style={{ marginLeft: 'auto' }}>
+            Try again
+          </button>
         </div>
       )}
 
@@ -76,6 +71,16 @@ export const AuditLogsPage = () => {
                   <td colSpan={6} style={{ textAlign: 'center', padding: '3rem' }}>
                     <RefreshCw className="spin" size={28} style={{ color: 'var(--primary)', marginBottom: '0.5rem' }} />
                     <p style={{ color: 'var(--text-muted)' }}>Loading audit trail security log...</p>
+                  </td>
+                </tr>
+              ) : error ? (
+                <tr>
+                  <td colSpan={6} style={{ textAlign: 'center', padding: '3rem' }}>
+                    <AlertTriangle size={32} style={{ color: 'var(--risk-high)', marginBottom: '0.5rem' }} />
+                    <p style={{ fontSize: '1rem', color: 'var(--text-main)', marginBottom: '1rem' }}>{error}</p>
+                    <button className="btn btn-primary btn-sm" onClick={fetchLogs}>
+                      Try again
+                    </button>
                   </td>
                 </tr>
               ) : !Array.isArray(logs) || logs.length === 0 ? (
