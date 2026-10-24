@@ -2,6 +2,10 @@
 
 SentinelGuard is an enterprise fraud detection and case investigation platform. The system ingests financial transactions, evaluates them against a rule-based fraud scoring engine, automatically flags anomalies, and orchestrates an investigation lifecycle across analysts and supervisors with role-based access control (RBAC) and audit trails.
 
+**Live demo:** https://fraud-detection-system-vulk.onrender.com
+
+> Hosted on a free tier, so the first visit after inactivity can take about a minute to wake up. The database holds synthetic demo data only and resets whenever the service restarts, so do not upload real or personal data. Demo usernames are `analyst1`, `supervisor1` and `admin`; the password is shared separately.
+
 ---
 
 ## Table of Contents
