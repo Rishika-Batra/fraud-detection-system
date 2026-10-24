@@ -96,6 +96,7 @@ export const LoginPage = () => {
           </button>
         </form>
 
+        {import.meta.env.VITE_SHOW_DEMO_LOGIN === 'true' && (
         <div className="quick-demo-section">
           <div className="demo-divider">
             <span>Quick Demo Credentials</span>
@@ -127,6 +128,7 @@ export const LoginPage = () => {
             </button>
           </div>
         </div>
+        )}
       </div>
 
       <style>{`

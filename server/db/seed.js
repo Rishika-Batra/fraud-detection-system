@@ -29,33 +29,6 @@
 require('dotenv').config();
 
 // ─────────────────────────────────────────────────────────
-// SAFETY: Block production execution
-// ─────────────────────────────────────────────────────────
-if (process.env.NODE_ENV === 'production') {
-  console.error('❌ FATAL: Seed script refuses to run when NODE_ENV=production.');
-  console.error('   This script drops and recreates ALL tables. Never run it against live data.');
-  process.exit(1);
-}
-
-// ─────────────────────────────────────────────────────────
-// SAFETY: Require --yes flag for destructive action
-// ─────────────────────────────────────────────────────────
-const confirmed = process.argv.includes('--yes');
-if (!confirmed) {
-  console.log('🔍 DRY RUN — showing what the seeder would do:\n');
-  console.log('  • Drop and recreate ALL tables (sequelize.sync({ force: true }))');
-  console.log('  • Create 6 users (1 admin, 3 analysts, 2 supervisors)');
-  console.log('  • Generate ~300 transactions over the last 30 days');
-  console.log('  • Score each transaction with the real scoring engine');
-  console.log('  • Create ~25 cases with realistic status progression');
-  console.log('  • Write audit log entries for all seeded actions\n');
-  console.log('⚠️  This will DELETE all existing data.');
-  console.log('   To proceed, run: npm run seed -- --yes');
-  console.log('   To set a password: SEED_PASSWORD=MyPass123 npm run seed -- --yes');
-  process.exit(0);
-}
-
-// ─────────────────────────────────────────────────────────
 // Imports — reuse existing app code, not raw SQL
 // ─────────────────────────────────────────────────────────
 const { sequelize, User, Transaction, Case, CaseNote, AuditLog } = require('../models');
@@ -272,25 +245,17 @@ function generateTransactions() {
 }
 
 // ─────────────────────────────────────────────────────────
-// Main seed function
+// Reusable seeding function (steps 2-5: users, transactions, cases, summary)
+// Called by both the CLI `seed()` and the startup `bootstrapDemo.js`.
+// Accepts { password } — the demo password to use for all accounts.
 // ─────────────────────────────────────────────────────────
-async function seed() {
-  console.log('\n🌱 Seeding database...\n');
+async function seedDatabase({ password } = {}) {
 
-  // ── Step 1: Drop and recreate ALL tables ──
-  // We use force: true which DROPs every table and recreates it from the model definitions.
-  // This is necessary because the AuditLog model has beforeDestroy/beforeUpdate hooks
-  // that throw errors, making it impossible to delete rows through the ORM.
-  // force: true bypasses the hooks entirely by issuing DROP TABLE at the SQL level.
-  console.log('  ⏳ Dropping and recreating all tables (sequelize.sync force)...');
-  await sequelize.sync({ force: true });
-  console.log('  ✅ Tables recreated.\n');
-
-  // ── Step 2: Create users ──
-  // Read password from env or generate a secure random one.
+  // ── Create users ──
+  // Read password from the argument, env, or generate a secure random one.
   // We never store the password in the repo — it's either provided at runtime or printed once.
-  const demoPassword = process.env.SEED_PASSWORD || require('crypto').randomBytes(12).toString('base64url');
-  const passwordGenerated = !process.env.SEED_PASSWORD;
+  const demoPassword = password || process.env.SEED_PASSWORD || require('crypto').randomBytes(12).toString('base64url');
+  const passwordGenerated = !password && !process.env.SEED_PASSWORD;
 
   const usersData = [
     { username: 'admin',       role: 'admin' },
@@ -562,11 +527,60 @@ async function seed() {
 }
 
 // ─────────────────────────────────────────────────────────
-// Run
+// CLI entry-point seed function
+// Drops and recreates all tables, then calls the reusable seedDatabase().
 // ─────────────────────────────────────────────────────────
-seed()
-  .then(() => process.exit(0))
-  .catch(err => {
-    console.error('\n❌ Seed failed:', err);
+async function seed() {
+  console.log('\n🌱 Seeding database...\n');
+
+  // ── Step 1: Drop and recreate ALL tables ──
+  // We use force: true which DROPs every table and recreates it from the model definitions.
+  // This is necessary because the AuditLog model has beforeDestroy/beforeUpdate hooks
+  // that throw errors, making it impossible to delete rows through the ORM.
+  // force: true bypasses the hooks entirely by issuing DROP TABLE at the SQL level.
+  console.log('  ⏳ Dropping and recreating all tables (sequelize.sync force)...');
+  await sequelize.sync({ force: true });
+  console.log('  ✅ Tables recreated.\n');
+
+  await seedDatabase();
+}
+
+// ─────────────────────────────────────────────────────────
+// Export for reuse by bootstrapDemo.js
+// ─────────────────────────────────────────────────────────
+module.exports = { seedDatabase };
+
+// ─────────────────────────────────────────────────────────
+// Run only when invoked directly as a CLI script
+// ─────────────────────────────────────────────────────────
+if (require.main === module) {
+  // ── SAFETY: Block production execution ──
+  if (process.env.NODE_ENV === 'production') {
+    console.error('❌ FATAL: Seed script refuses to run when NODE_ENV=production.');
+    console.error('   This script drops and recreates ALL tables. Never run it against live data.');
     process.exit(1);
-  });
+  }
+
+  // ── SAFETY: Require --yes flag for destructive action ──
+  const confirmed = process.argv.includes('--yes');
+  if (!confirmed) {
+    console.log('🔍 DRY RUN — showing what the seeder would do:\n');
+    console.log('  • Drop and recreate ALL tables (sequelize.sync({ force: true }))');
+    console.log('  • Create 6 users (1 admin, 3 analysts, 2 supervisors)');
+    console.log('  • Generate ~300 transactions over the last 30 days');
+    console.log('  • Score each transaction with the real scoring engine');
+    console.log('  • Create ~25 cases with realistic status progression');
+    console.log('  • Write audit log entries for all seeded actions\n');
+    console.log('⚠️  This will DELETE all existing data.');
+    console.log('   To proceed, run: npm run seed -- --yes');
+    console.log('   To set a password: SEED_PASSWORD=MyPass123 npm run seed -- --yes');
+    process.exit(0);
+  }
+
+  seed()
+    .then(() => process.exit(0))
+    .catch(err => {
+      console.error('\n❌ Seed failed:', err);
+      process.exit(1);
+    });
+}
