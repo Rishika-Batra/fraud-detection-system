@@ -57,12 +57,12 @@ export const AuditLogsPage = () => {
           <table className="data-table">
             <thead>
               <tr>
-                <th>Log ID</th>
-                <th>Actor User</th>
-                <th>Action Code</th>
-                <th>Target Entity</th>
-                <th>Action Details</th>
-                <th>Timestamp</th>
+                <th>LOG ID</th>
+                <th>ACTOR USER</th>
+                <th>ACTION CODE</th>
+                <th>TARGET ENTITY</th>
+                <th>DETAILS</th>
+                <th>TIMESTAMP</th>
               </tr>
             </thead>
             <tbody>
@@ -92,15 +92,15 @@ export const AuditLogsPage = () => {
               ) : (
                 logs.map((log) => (
                   <tr key={log.id || Math.random()}>
-                    <td className="mono" style={{ fontWeight: 600 }}>#{log.id}</td>
+                    <td className="mono" style={{ fontWeight: 600, color: 'var(--gold-light)' }}>#{log.id}</td>
                     <td>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
-                        <User size={14} style={{ color: 'var(--primary)' }} />
+                        <User size={14} style={{ color: 'var(--gold)' }} />
                         <span style={{ fontWeight: 600 }}>{log.user ? log.user.username : `User #${log.user_id || 'System'}`}</span>
                       </div>
                     </td>
                     <td>
-                      <span className="mono" style={{ fontSize: '0.8rem', padding: '0.2rem 0.5rem', background: 'rgba(99,102,241,0.15)', borderRadius: '4px', color: '#a5b4fc', fontWeight: 600 }}>
+                      <span className="mono" style={{ fontSize: '0.75rem', padding: '0.2rem 0.5rem', background: 'rgba(201, 162, 75, 0.1)', borderRadius: '4px', border: '1px solid var(--gold-border)', color: 'var(--gold-light)', fontWeight: 600 }}>
                         {log.action}
                       </span>
                     </td>
@@ -113,7 +113,7 @@ export const AuditLogsPage = () => {
                       </span>
                     </td>
                     <td>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', fontSize: '0.8rem', color: 'var(--text-dim)' }}>
+                      <div className="mono" style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
                         <Clock size={12} />
                         <span>{log.timestamp ? new Date(log.timestamp).toLocaleString() : 'N/A'}</span>
                       </div>

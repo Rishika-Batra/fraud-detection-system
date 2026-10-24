@@ -180,32 +180,32 @@ export const DashboardPage = () => {
       {/* KPI Cards Grid */}
       <div className="stats-grid">
         <StatCard
-          title="Monitored Transactions"
+          title="TRANSACTIONS"
           value={totalCount.toLocaleString()}
           subtext={`Vol: ₹${totalAmountSum.toLocaleString('en-IN', { maximumFractionDigits: 0 })}`}
           icon={Activity}
-          color="indigo"
+          valueColor="bright"
         />
         <StatCard
-          title="High Risk Signals"
-          value={highRiskCount}
-          subtext={`${((highRiskCount / (transactions.length || 1)) * 100).toFixed(1)}% of total volume`}
-          icon={AlertTriangle}
-          color="rose"
-        />
-        <StatCard
-          title="Flagged for Investigation"
+          title="FLAGGED"
           value={flaggedCount}
           subtext="FR-09 Active Case Pipeline"
           icon={Flag}
-          color="amber"
+          valueColor="gold-light"
         />
         <StatCard
-          title="Average Risk Score"
-          value={`${avgRiskScore} / 100`}
-          subtext={avgRiskScore > 50 ? 'Elevated threat level' : 'Normal risk profile'}
+          title="HIGH RISK"
+          value={highRiskCount}
+          subtext={`${((highRiskCount / (transactions.length || 1)) * 100).toFixed(1)}% of total volume`}
+          icon={AlertTriangle}
+          valueColor="danger"
+        />
+        <StatCard
+          title="OPEN CASES"
+          value={flaggedCount}
+          subtext="Pending analyst resolution"
           icon={TrendingUp}
-          color={avgRiskScore > 50 ? 'rose' : 'emerald'}
+          valueColor="green"
         />
       </div>
       <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.5rem', marginBottom: '1rem', fontStyle: 'italic' }}>
@@ -313,14 +313,14 @@ export const DashboardPage = () => {
           <table className="data-table">
             <thead>
               <tr>
-                <th>Tx ID</th>
-                <th>Account Identifier</th>
-                <th>Amount & Currency</th>
-                <th>Merchant</th>
-                <th>Type / Region</th>
-                <th>Risk Indicator</th>
-                <th>Case Status</th>
-                <th style={{ textAlign: 'right' }}>Actions</th>
+                <th>TX ID</th>
+                <th>ACCOUNT</th>
+                <th>AMOUNT</th>
+                <th>SCORE</th>
+                <th>MERCHANT</th>
+                <th>TYPE / REGION</th>
+                <th>STATUS</th>
+                <th style={{ textAlign: 'right' }}>ACTIONS</th>
               </tr>
             </thead>
             <tbody>
@@ -349,8 +349,8 @@ export const DashboardPage = () => {
                 </tr>
               ) : (
                 transactions.map((tx) => (
-                  <tr key={tx.id}>
-                    <td className="mono" style={{ fontWeight: 600, color: 'var(--primary)' }}>
+                  <tr key={tx.id} className={tx.is_flagged ? 'row-flagged' : ''}>
+                    <td className="mono" style={{ fontWeight: 600, color: 'var(--gold-light)' }}>
                       #{tx.id}
                       {tx.source === 'uploaded' && (
                         <span
@@ -359,9 +359,9 @@ export const DashboardPage = () => {
                             marginLeft: '0.4rem',
                             fontSize: '0.65rem',
                             padding: '0.15rem 0.4rem',
-                            backgroundColor: 'rgba(56, 189, 248, 0.15)',
-                            color: '#38bdf8',
-                            border: '1px solid rgba(56, 189, 248, 0.3)',
+                            backgroundColor: 'rgba(201, 162, 75, 0.12)',
+                            color: 'var(--gold-light)',
+                            border: '1px solid var(--gold-border)',
                             borderRadius: '4px',
                             fontWeight: 600,
                             verticalAlign: 'middle',
@@ -376,17 +376,17 @@ export const DashboardPage = () => {
                       <span className="mono" style={{ fontWeight: 600 }}>{tx.account_id}</span>
                     </td>
                     <td>
-                      <span style={{ fontWeight: 700, fontSize: '0.95rem' }}>
+                      <span className="mono" style={{ fontWeight: 700, fontSize: '0.95rem' }}>
                         {formatMoney(tx.amount, tx.currency)}
                       </span>
+                    </td>
+                    <td>
+                      <RiskBadge level={tx.risk_level} score={tx.risk_score} />
                     </td>
                     <td>{tx.merchant || <span style={{ color: 'var(--text-dim)' }}>—</span>}</td>
                     <td>
                       <span style={{ textTransform: 'capitalize', fontWeight: 500 }}>{tx.transaction_type}</span>
-                      <div style={{ fontSize: '0.75rem', color: 'var(--text-dim)' }}>{tx.region || 'Global'}</div>
-                    </td>
-                    <td>
-                      <RiskBadge level={tx.risk_level} score={tx.risk_score} />
+                      <div className="mono" style={{ fontSize: '0.75rem', color: 'var(--text-dim)' }}>{tx.region || 'Global'}</div>
                     </td>
                     <td>
                       {tx.is_flagged ? (

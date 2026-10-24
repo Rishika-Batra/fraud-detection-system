@@ -141,14 +141,14 @@ export const CasesPage = () => {
           <table className="data-table">
             <thead>
               <tr>
-                <th>Case ID</th>
-                <th>Linked Tx ID</th>
-                <th>Transaction Amount</th>
-                <th>Risk Profile</th>
-                <th>Assigned To</th>
-                <th>Created Timestamp</th>
-                <th>Workflow Status</th>
-                <th style={{ textAlign: 'right' }}>Actions</th>
+                <th>CASE ID</th>
+                <th>LINKED TX ID</th>
+                <th>AMOUNT</th>
+                <th>RISK PROFILE</th>
+                <th>ASSIGNED TO</th>
+                <th>TIMESTAMP</th>
+                <th>STATUS</th>
+                <th style={{ textAlign: 'right' }}>ACTIONS</th>
               </tr>
             </thead>
             <tbody>
@@ -179,15 +179,15 @@ export const CasesPage = () => {
               ) : (
                 cases.map((c) => (
                   <tr key={c.id}>
-                    <td className="mono" style={{ fontWeight: 700, color: 'var(--primary)' }}>
+                    <td className="mono" style={{ fontWeight: 700, color: 'var(--gold-light)' }}>
                       CASE-#{c.id}
                     </td>
-                    <td className="mono">
+                    <td className="mono" style={{ color: 'var(--text-soft)' }}>
                       #{c.transaction_id}
                     </td>
                     <td>
                       {c.transaction ? (
-                        <span style={{ fontWeight: 700 }}>
+                        <span className="mono" style={{ fontWeight: 700 }}>
                           {formatMoney(c.transaction.amount, c.transaction.currency)}
                         </span>
                       ) : (
@@ -203,12 +203,12 @@ export const CasesPage = () => {
                     </td>
                     <td>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
-                        <User size={14} style={{ color: 'var(--text-muted)' }} />
-                        <span>{c.assignee ? c.assignee.username : <span style={{ color: 'var(--text-dim)', italic: true }}>Unassigned</span>}</span>
+                        <User size={14} style={{ color: 'var(--gold)' }} />
+                        <span>{c.assignee ? c.assignee.username : <span style={{ color: 'var(--text-dim)', fontStyle: 'italic' }}>Unassigned</span>}</span>
                       </div>
                     </td>
                     <td>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                      <div className="mono" style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
                         <Clock size={13} />
                         <span>{new Date(c.created_at).toLocaleString()}</span>
                       </div>
@@ -244,36 +244,40 @@ export const CasesPage = () => {
 
         .status-tabs {
           display: flex;
-          gap: 0.4rem;
-          background: rgba(15, 23, 42, 0.6);
-          padding: 0.35rem;
-          border-radius: var(--radius-md);
-          border: 1px solid var(--border-color);
+          gap: 0.35rem;
+          background: var(--surface-2);
+          padding: 0.3rem;
+          border-radius: var(--radius-sm);
+          border: 1px solid var(--border);
           overflow-x: auto;
         }
 
         .tab-btn {
           background: none;
           border: none;
-          padding: 0.5rem 0.9rem;
-          font-family: var(--font-sans);
-          font-size: 0.825rem;
+          padding: 0.45rem 0.85rem;
+          font-family: var(--font-mono);
+          font-size: 0.78rem;
           font-weight: 600;
           color: var(--text-muted);
-          border-radius: var(--radius-sm);
+          border-radius: 4px;
           cursor: pointer;
           transition: all 0.2s;
           white-space: nowrap;
+          text-transform: uppercase;
+          letter-spacing: 0.04em;
         }
 
         .tab-btn:hover {
-          color: #fff;
+          color: var(--text-bright);
+          background: var(--surface);
         }
 
         .tab-btn.active {
-          background: var(--primary);
-          color: #fff;
-          box-shadow: 0 2px 8px rgba(99, 102, 241, 0.4);
+          background: linear-gradient(135deg, #D8B45A 0%, #B58A2E 100%);
+          color: #1A1408;
+          font-weight: 700;
+          box-shadow: 0 2px 8px rgba(201, 162, 75, 0.3);
         }
       `}</style>
     </div>

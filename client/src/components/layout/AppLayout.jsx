@@ -11,8 +11,6 @@ import {
   User,
   Menu,
   X,
-  AlertTriangle,
-  CheckCircle2,
   UploadCloud,
 } from 'lucide-react';
 
@@ -51,25 +49,25 @@ export const AppLayout = () => {
 
   return (
     <div className="app-container">
-      {/* Sidebar */}
+      {/* Sidebar (248px) */}
       <aside className={`sidebar ${sidebarOpen ? 'open' : ''}`}>
         <div className="sidebar-brand">
           <div className="brand-logo">
-            <Shield className="brand-icon" size={28} />
+            <Shield className="brand-icon" size={24} />
           </div>
           <div className="brand-text">
-            <h2>SentinelGuard</h2>
-            <span className="brand-tag">Fraud Detection v1.0</span>
+            <h2>SENTINELGUARD</h2>
+            <span className="brand-tag">FRAUD DESK v1.0</span>
           </div>
         </div>
 
         <div className="user-profile-badge">
           <div className="avatar">
-            <User size={18} />
+            <User size={16} />
           </div>
           <div className="user-info">
             <div className="username">{user?.username || 'Analyst'}</div>
-            <div className={`role-badge role-${user?.role || 'analyst'}`}>
+            <div className="role-chip">
               {user?.role || 'analyst'}
             </div>
           </div>
@@ -81,7 +79,7 @@ export const AppLayout = () => {
             className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
             onClick={() => setSidebarOpen(false)}
           >
-            <LayoutDashboard size={20} />
+            <LayoutDashboard size={18} />
             <span>Dashboard (FR-08)</span>
           </NavLink>
 
@@ -90,7 +88,7 @@ export const AppLayout = () => {
             className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
             onClick={() => setSidebarOpen(false)}
           >
-            <Briefcase size={20} />
+            <Briefcase size={18} />
             <span>Case Desk (FR-09)</span>
           </NavLink>
 
@@ -99,7 +97,7 @@ export const AppLayout = () => {
             className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
             onClick={() => setSidebarOpen(false)}
           >
-            <BarChart3 size={20} />
+            <BarChart3 size={18} />
             <span>Analytics (FR-10)</span>
           </NavLink>
 
@@ -109,7 +107,7 @@ export const AppLayout = () => {
               className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
               onClick={() => setSidebarOpen(false)}
             >
-              <UploadCloud size={20} />
+              <UploadCloud size={18} />
               <span>Upload Data</span>
             </NavLink>
           )}
@@ -120,7 +118,7 @@ export const AppLayout = () => {
               className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
               onClick={() => setSidebarOpen(false)}
             >
-              <FileText size={20} />
+              <FileText size={18} />
               <span>Audit Logs</span>
             </NavLink>
           )}
@@ -128,7 +126,7 @@ export const AppLayout = () => {
 
         <div className="sidebar-footer">
           <button onClick={handleLogout} className="btn-logout">
-            <LogOut size={18} />
+            <LogOut size={16} />
             <span>Sign Out</span>
           </button>
         </div>
@@ -141,8 +139,9 @@ export const AppLayout = () => {
             <button
               className="mobile-menu-btn"
               onClick={() => setSidebarOpen(!sidebarOpen)}
+              aria-label="Toggle Navigation Menu"
             >
-              {sidebarOpen ? <X size={24} /> : <Menu size={24} />}
+              {sidebarOpen ? <X size={22} /> : <Menu size={22} />}
             </button>
             <div>
               <h1 className="page-header-title">{title}</h1>
@@ -151,10 +150,6 @@ export const AppLayout = () => {
           </div>
 
           <div className="header-right">
-            <div className="system-status-indicator">
-              <span className="status-dot"></span>
-              <span className="status-label">Backend Connected</span>
-            </div>
             <div className="header-user-tag">
               <span className="user-role-pill">{user?.role}</span>
               <span className="user-name-text">{user?.username}</span>
@@ -169,9 +164,10 @@ export const AppLayout = () => {
 
       <style>{`
         .sidebar {
-          width: 270px;
-          background-color: #0b0f19;
-          border-right: 1px solid var(--border-color);
+          width: 248px;
+          min-width: 248px;
+          background-color: var(--bg-sidebar);
+          border-right: 1px solid var(--border);
           display: flex;
           flex-direction: column;
           padding: 1.5rem 1rem;
@@ -183,40 +179,43 @@ export const AppLayout = () => {
           display: flex;
           align-items: center;
           gap: 0.75rem;
-          padding-bottom: 1.5rem;
-          border-bottom: 1px solid var(--border-color);
+          padding-bottom: 1.25rem;
+          border-bottom: 1px solid var(--border);
           margin-bottom: 1.25rem;
         }
 
         .brand-logo {
-          width: 42px;
-          height: 42px;
-          background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
-          border-radius: 12px;
+          width: 36px;
+          height: 36px;
+          border-radius: 8px;
+          border: 1px solid var(--gold-border);
+          background: rgba(201, 162, 75, 0.1);
           display: flex;
           align-items: center;
           justify-content: center;
-          color: white;
-          box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+          color: var(--gold);
         }
 
         .brand-text h2 {
-          font-size: 1.15rem;
+          font-family: var(--font-serif);
+          font-size: 0.95rem;
           font-weight: 700;
-          color: #fff;
+          color: var(--gold-light);
+          letter-spacing: 0.12em;
           line-height: 1.2;
         }
 
         .brand-tag {
-          font-size: 0.7rem;
+          font-size: 0.65rem;
           color: var(--text-muted);
           font-family: var(--font-mono);
+          letter-spacing: 0.08em;
         }
 
         .user-profile-badge {
-          background: rgba(30, 41, 59, 0.5);
-          border: 1px solid var(--border-color);
-          border-radius: var(--radius-md);
+          background: var(--surface);
+          border: 1px solid var(--border);
+          border-radius: var(--radius-sm);
           padding: 0.75rem;
           display: flex;
           align-items: center;
@@ -225,40 +224,42 @@ export const AppLayout = () => {
         }
 
         .avatar {
-          width: 34px;
-          height: 34px;
-          border-radius: 50%;
-          background: #334155;
+          width: 32px;
+          height: 32px;
+          border-radius: 6px;
+          background: var(--surface-2);
+          border: 1px solid var(--border);
           display: flex;
           align-items: center;
           justify-content: center;
-          color: #cbd5e1;
+          color: var(--gold-light);
         }
 
         .username {
-          font-size: 0.875rem;
+          font-size: 0.85rem;
           font-weight: 600;
-          color: var(--text-main);
+          color: var(--text-bright);
         }
 
-        .role-badge {
+        .role-chip {
+          font-family: var(--font-mono);
           font-size: 0.65rem;
-          font-weight: 700;
+          font-weight: 600;
           text-transform: uppercase;
-          letter-spacing: 0.05em;
-          padding: 0.15rem 0.4rem;
+          letter-spacing: 0.1em;
+          padding: 0.15rem 0.45rem;
           border-radius: 4px;
+          border: 1px solid var(--gold-border);
+          background: rgba(201, 162, 75, 0.08);
+          color: var(--gold-light);
           display: inline-block;
+          margin-top: 0.2rem;
         }
-
-        .role-admin { background: rgba(239, 68, 68, 0.2); color: #fca5a5; }
-        .role-supervisor { background: rgba(245, 158, 11, 0.2); color: #fde047; }
-        .role-analyst { background: rgba(59, 130, 246, 0.2); color: #93c5fd; }
 
         .sidebar-nav {
           display: flex;
           flex-direction: column;
-          gap: 0.4rem;
+          gap: 0.35rem;
           flex: 1;
         }
 
@@ -266,29 +267,30 @@ export const AppLayout = () => {
           display: flex;
           align-items: center;
           gap: 0.75rem;
-          padding: 0.75rem 1rem;
-          border-radius: var(--radius-md);
+          padding: 0.65rem 0.85rem;
+          border-radius: var(--radius-sm);
           color: var(--text-muted);
           font-weight: 500;
-          font-size: 0.875rem;
+          font-size: 0.85rem;
           transition: all 0.2s;
+          border-left: 3px solid transparent;
         }
 
         .nav-link:hover {
-          background: rgba(255, 255, 255, 0.05);
-          color: #fff;
+          background: var(--surface-2);
+          color: var(--text-bright);
         }
 
         .nav-link.active {
-          background: linear-gradient(90deg, rgba(99, 102, 241, 0.2) 0%, rgba(99, 102, 241, 0.05) 100%);
-          border-left: 3px solid var(--primary);
-          color: #fff;
+          background: rgba(15, 61, 44, 0.35);
+          border-left: 3px solid var(--gold);
+          color: var(--gold-light);
           font-weight: 600;
         }
 
         .sidebar-footer {
           padding-top: 1rem;
-          border-top: 1px solid var(--border-color);
+          border-top: 1px solid var(--border);
         }
 
         .btn-logout {
@@ -296,27 +298,28 @@ export const AppLayout = () => {
           display: flex;
           align-items: center;
           gap: 0.75rem;
-          padding: 0.7rem 1rem;
-          border-radius: var(--radius-md);
-          border: 1px solid rgba(239, 68, 68, 0.2);
-          background: rgba(239, 68, 68, 0.08);
-          color: #fca5a5;
+          padding: 0.65rem 0.85rem;
+          border-radius: var(--radius-sm);
+          border: 1px solid var(--border);
+          background: var(--surface);
+          color: var(--text-muted);
           font-weight: 600;
-          font-size: 0.85rem;
+          font-size: 0.825rem;
           cursor: pointer;
           transition: all 0.2s;
         }
 
         .btn-logout:hover {
-          background: rgba(239, 68, 68, 0.2);
-          color: #fff;
+          border-color: var(--danger);
+          background: var(--danger-bg);
+          color: var(--danger-text);
         }
 
         .top-header {
-          height: 70px;
-          background: rgba(15, 23, 42, 0.8);
+          height: 64px;
+          background: rgba(11, 16, 14, 0.85);
           backdrop-filter: blur(12px);
-          border-bottom: 1px solid var(--border-color);
+          border-bottom: 1px solid var(--border);
           padding: 0 2rem;
           display: flex;
           align-items: center;
@@ -333,12 +336,16 @@ export const AppLayout = () => {
         }
 
         .page-header-title {
-          font-size: 1.25rem;
+          font-family: var(--font-serif);
+          font-size: 1.2rem;
+          font-weight: 700;
+          color: var(--text-bright);
+          letter-spacing: 0.04em;
           line-height: 1.2;
         }
 
         .page-header-subtitle {
-          font-size: 0.775rem;
+          font-size: 0.75rem;
           color: var(--text-muted);
         }
 
@@ -346,65 +353,38 @@ export const AppLayout = () => {
           display: none;
           background: none;
           border: none;
-          color: #fff;
+          color: var(--text);
           cursor: pointer;
         }
 
         .header-right {
           display: flex;
           align-items: center;
-          gap: 1.5rem;
-        }
-
-        .system-status-indicator {
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
-          padding: 0.35rem 0.75rem;
-          background: rgba(16, 185, 129, 0.1);
-          border: 1px solid rgba(16, 185, 129, 0.25);
-          border-radius: 9999px;
-          font-size: 0.75rem;
-          color: #6ee7b7;
-          font-weight: 500;
-        }
-
-        .status-dot {
-          width: 7px;
-          height: 7px;
-          background: #10b981;
-          border-radius: 50%;
-          box-shadow: 0 0 8px #10b981;
-          animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-          0% { opacity: 0.4; }
-          50% { opacity: 1; }
-          100% { opacity: 0.4; }
+          gap: 1rem;
         }
 
         .header-user-tag {
           display: flex;
           align-items: center;
           gap: 0.5rem;
-          background: var(--bg-card);
+          background: var(--surface);
           padding: 0.35rem 0.75rem;
-          border-radius: var(--radius-md);
-          border: 1px solid var(--border-color);
+          border-radius: var(--radius-sm);
+          border: 1px solid var(--border);
           font-size: 0.8rem;
         }
 
         .user-role-pill {
+          font-family: var(--font-mono);
           font-size: 0.65rem;
           font-weight: 700;
           text-transform: uppercase;
-          color: var(--primary);
+          color: var(--gold);
         }
 
         .user-name-text {
           font-weight: 600;
-          color: var(--text-main);
+          color: var(--text-bright);
         }
 
         @media (max-width: 900px) {

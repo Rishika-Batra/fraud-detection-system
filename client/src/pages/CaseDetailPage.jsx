@@ -351,7 +351,7 @@ export const CaseDetailPage = () => {
                   </div>
                   <div>
                     <label className="form-label">Amount</label>
-                    <div style={{ fontSize: '1.15rem', fontWeight: 800, color: '#fff' }}>
+                    <div className="mono" style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--text-bright)' }}>
                       {formatMoney(transaction.amount, transaction.currency)}
                     </div>
                   </div>
@@ -361,16 +361,16 @@ export const CaseDetailPage = () => {
                   </div>
                 </div>
 
-                <div style={{ padding: '0.75rem', background: 'rgba(15, 23, 42, 0.6)', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)' }}>
+                <div style={{ padding: '0.85rem', background: 'var(--surface-2)', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border)' }}>
                   <label className="form-label" style={{ marginBottom: '0.4rem' }}>Risk Score Evaluation</label>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                     <RiskBadge level={transaction.risk_level} score={transaction.risk_score} />
-                    <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Region: {transaction.region || 'Global'}</span>
+                    <span className="mono" style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Region: {transaction.region || 'Global'}</span>
                   </div>
                   {transaction.risk_factors && transaction.risk_factors.length > 0 && (
                     <div style={{ marginTop: '0.75rem' }}>
-                      <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-dim)', textTransform: 'uppercase' }}>Risk Rule Violations:</span>
-                      <ul style={{ marginTop: '0.25rem', paddingLeft: '1.2rem', color: 'var(--risk-high)', fontSize: '0.825rem' }}>
+                      <span className="mono" style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-soft)', textTransform: 'uppercase' }}>Risk Rule Violations:</span>
+                      <ul style={{ marginTop: '0.25rem', paddingLeft: '1.2rem', color: 'var(--danger-text)', fontSize: '0.825rem' }}>
                         {transaction.risk_factors.map((rf, idx) => (
                           <li key={idx}>{rf}</li>
                         ))}
@@ -497,10 +497,10 @@ export const CaseDetailPage = () => {
           display: flex;
           align-items: center;
           justify-content: space-between;
-          padding: 0.75rem;
-          background: rgba(15, 23, 42, 0.6);
-          border-radius: var(--radius-md);
-          border: 1px solid var(--border-color);
+          padding: 0.85rem;
+          background: var(--surface-2);
+          border-radius: var(--radius-sm);
+          border: 1px solid var(--border);
         }
 
         .flow-step {
@@ -509,15 +509,19 @@ export const CaseDetailPage = () => {
           align-items: center;
           gap: 0.25rem;
           font-size: 0.725rem;
+          font-family: var(--font-mono);
           color: var(--text-muted);
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
         }
 
         .step-circle {
           width: 26px;
           height: 26px;
           border-radius: 50%;
-          background: #334155;
-          color: #fff;
+          background: var(--surface);
+          border: 1px solid var(--border);
+          color: var(--text-muted);
           display: flex;
           align-items: center;
           justify-content: center;
@@ -526,14 +530,16 @@ export const CaseDetailPage = () => {
         }
 
         .step-circle.active {
-          background: var(--primary);
-          box-shadow: 0 0 10px rgba(99, 102, 241, 0.5);
+          background: linear-gradient(135deg, #D8B45A 0%, #B58A2E 100%);
+          color: #1A1408;
+          border-color: var(--gold);
+          box-shadow: 0 0 10px rgba(201, 162, 75, 0.4);
         }
 
         .flow-line {
           flex: 1;
           height: 2px;
-          background: var(--border-color);
+          background: var(--border);
           margin: 0 0.5rem;
         }
 
@@ -548,9 +554,9 @@ export const CaseDetailPage = () => {
         }
 
         .note-card {
-          background: rgba(15, 23, 42, 0.7);
-          border: 1px solid var(--border-color);
-          border-radius: var(--radius-md);
+          background: var(--surface-2);
+          border: 1px solid var(--border);
+          border-radius: var(--radius-sm);
           padding: 0.85rem 1rem;
         }
 
@@ -566,21 +572,23 @@ export const CaseDetailPage = () => {
           display: flex;
           align-items: center;
           gap: 0.35rem;
+          font-family: var(--font-mono);
           font-weight: 600;
-          color: var(--primary);
+          color: var(--gold-light);
         }
 
         .note-time {
           display: flex;
           align-items: center;
           gap: 0.25rem;
-          color: var(--text-dim);
+          font-family: var(--font-mono);
+          color: var(--text-muted);
         }
 
         .note-body {
           font-size: 0.875rem;
-          color: var(--text-main);
-          line-height: 1.4;
+          color: var(--text);
+          line-height: 1.5;
         }
 
         .add-note-form {
