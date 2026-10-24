@@ -107,9 +107,9 @@ export const ReportsPage = () => {
 
   // Prepare chart data structures
   const riskBarData = summary ? [
-    { level: 'Low Risk', count: summary.by_risk_level?.low ?? 0, fill: '#10b981' },
-    { level: 'Medium Risk', count: summary.by_risk_level?.medium ?? 0, fill: '#f59e0b' },
-    { level: 'High Risk', count: summary.by_risk_level?.high ?? 0, fill: '#f43f5e' },
+    { level: 'Low Risk', count: summary.by_risk_level?.low ?? 0, fill: '#4FD6A0' },
+    { level: 'Medium Risk', count: summary.by_risk_level?.medium ?? 0, fill: '#E3C777' },
+    { level: 'High Risk', count: summary.by_risk_level?.high ?? 0, fill: '#FF6B76' },
   ] : [];
 
   return (
@@ -272,16 +272,16 @@ export const ReportsPage = () => {
           <div style={{ flex: 1, minHeight: '300px', width: '100%' }}>
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={trends}>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.08)" />
-                <XAxis dataKey="period" stroke="#94a3b8" style={{ fontSize: '0.75rem' }} />
-                <YAxis stroke="#94a3b8" style={{ fontSize: '0.75rem' }} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#1E2B24" />
+                <XAxis dataKey="period" stroke="#8E9A92" style={{ fontSize: '0.75rem', fontFamily: 'var(--font-mono)' }} />
+                <YAxis stroke="#8E9A92" style={{ fontSize: '0.75rem', fontFamily: 'var(--font-mono)' }} />
                 <Tooltip
-                  contentStyle={{ backgroundColor: '#1e293b', borderColor: 'var(--border-color)', borderRadius: '8px', color: '#fff' }}
+                  contentStyle={{ backgroundColor: '#0F1613', borderColor: '#5B4A22', borderRadius: '6px', color: '#EDE8D6', fontFamily: 'var(--font-mono)' }}
                 />
                 <Legend wrapperStyle={{ fontSize: '0.8rem', paddingTop: '10px' }} />
-                <Line type="monotone" dataKey="total" name="Total Ingested" stroke="#6366f1" strokeWidth={2.5} dot={{ r: 4 }} />
-                <Line type="monotone" dataKey="high_risk" name="High Risk Signals" stroke="#f43f5e" strokeWidth={2.5} dot={{ r: 4 }} />
-                <Line type="monotone" dataKey="flagged" name="Flagged Cases" stroke="#f59e0b" strokeWidth={2} strokeDasharray="5 5" />
+                <Line type="monotone" dataKey="total" name="Total Ingested" stroke="#C9A24B" strokeWidth={2.5} dot={{ r: 4, fill: '#C9A24B' }} />
+                <Line type="monotone" dataKey="high_risk" name="High Risk Signals" stroke="#FF6B76" strokeWidth={2.5} dot={{ r: 4, fill: '#FF6B76' }} />
+                <Line type="monotone" dataKey="flagged" name="Flagged Cases" stroke="#E3C777" strokeWidth={2} strokeDasharray="5 5" />
               </LineChart>
             </ResponsiveContainer>
           </div>
@@ -293,10 +293,10 @@ export const ReportsPage = () => {
           <div style={{ flex: 1, minHeight: '300px', width: '100%' }}>
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={riskBarData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.08)" />
-                <XAxis dataKey="level" stroke="#94a3b8" style={{ fontSize: '0.75rem' }} />
-                <YAxis stroke="#94a3b8" style={{ fontSize: '0.75rem' }} />
-                <Tooltip contentStyle={{ backgroundColor: '#1e293b', borderColor: 'var(--border-color)', borderRadius: '8px', color: '#fff' }} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#1E2B24" />
+                <XAxis dataKey="level" stroke="#8E9A92" style={{ fontSize: '0.75rem' }} />
+                <YAxis stroke="#8E9A92" style={{ fontSize: '0.75rem', fontFamily: 'var(--font-mono)' }} />
+                <Tooltip contentStyle={{ backgroundColor: '#0F1613', borderColor: '#5B4A22', borderRadius: '6px', color: '#EDE8D6', fontFamily: 'var(--font-mono)' }} />
                 <Bar dataKey="count" name="Transaction Count" radius={[6, 6, 0, 0]}>
                   {riskBarData.map((entry, index) => (
                     <Bar key={`cell-${index}`} fill={entry.fill} dataKey="count" />
@@ -315,11 +315,11 @@ export const ReportsPage = () => {
           <table className="data-table">
             <thead>
               <tr>
-                <th>Region</th>
-                <th>Transaction Category</th>
-                <th>Total Volume Count</th>
-                <th>Avg Risk Score</th>
-                <th>Risk Intensity</th>
+                <th>REGION</th>
+                <th>CATEGORY</th>
+                <th>VOLUME</th>
+                <th>AVG SCORE</th>
+                <th>INTENSITY</th>
               </tr>
             </thead>
             <tbody>
@@ -332,12 +332,12 @@ export const ReportsPage = () => {
               ) : (
                 heatmap.map((cell, idx) => (
                   <tr key={idx}>
-                    <td style={{ fontWeight: 600 }}>{cell.region}</td>
+                    <td className="mono" style={{ fontWeight: 600 }}>{cell.region}</td>
                     <td style={{ textTransform: 'capitalize' }}>{cell.transaction_type}</td>
                     <td className="mono" style={{ fontWeight: 700 }}>{cell.count}</td>
                     <td className="mono">
                       <span style={{
-                        color: cell.average_risk_score > 50 ? 'var(--risk-high)' : cell.average_risk_score > 30 ? 'var(--risk-medium)' : 'var(--risk-low)',
+                        color: cell.average_risk_score > 50 ? 'var(--danger-text)' : cell.average_risk_score > 30 ? 'var(--gold-light)' : 'var(--green)',
                         fontWeight: 700
                       }}>
                         {cell.average_risk_score}
@@ -345,12 +345,12 @@ export const ReportsPage = () => {
                     </td>
                     <td>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                        <div style={{ flex: 1, background: '#1e293b', height: '8px', borderRadius: '4px', overflow: 'hidden' }}>
+                        <div style={{ flex: 1, background: 'var(--surface-2)', height: '8px', borderRadius: '4px', overflow: 'hidden' }}>
                           <div
                             style={{
                               width: `${Math.min(cell.average_risk_score * 1.2, 100)}%`,
                               height: '100%',
-                              background: cell.average_risk_score > 50 ? 'var(--risk-high)' : cell.average_risk_score > 30 ? 'var(--risk-medium)' : 'var(--risk-low)'
+                              background: cell.average_risk_score > 50 ? 'var(--danger)' : cell.average_risk_score > 30 ? 'var(--gold)' : 'var(--green)'
                             }}
                           />
                         </div>

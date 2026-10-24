@@ -499,9 +499,9 @@ export const UploadPage = () => {
                   {Object.entries(dryRunResult.columns?.matched || {}).map(([rawHeader, field]) => (
                     <tr key={rawHeader}>
                       <td className="mono" style={{ fontWeight: 600 }}>{rawHeader}</td>
-                      <td className="mono" style={{ color: 'var(--primary)', fontWeight: 600 }}>{field}</td>
+                      <td className="mono" style={{ color: 'var(--gold-light)', fontWeight: 600 }}>{field}</td>
                       <td>
-                        <span className="badge" style={{ backgroundColor: 'rgba(16, 185, 129, 0.15)', color: '#34d399' }}>
+                        <span className="badge" style={{ backgroundColor: 'rgba(79, 214, 160, 0.12)', color: 'var(--green)', border: '1px solid rgba(79, 214, 160, 0.3)' }}>
                           Matched
                         </span>
                       </td>
@@ -509,10 +509,10 @@ export const UploadPage = () => {
                   ))}
                   {(dryRunResult.columns?.ignored || []).map((rawHeader) => (
                     <tr key={rawHeader}>
-                      <td className="mono" style={{ color: 'var(--text-dim)' }}>{rawHeader}</td>
-                      <td style={{ color: 'var(--text-dim)' }}>—</td>
+                      <td className="mono" style={{ color: 'var(--text-soft)' }}>{rawHeader}</td>
+                      <td style={{ color: 'var(--text-soft)' }}>—</td>
                       <td>
-                        <span className="badge" style={{ backgroundColor: 'rgba(100, 116, 139, 0.15)', color: '#94a3b8' }}>
+                        <span className="badge" style={{ backgroundColor: 'var(--surface-2)', color: 'var(--text-muted)', border: '1px solid var(--border)' }}>
                           Ignored
                         </span>
                       </td>
@@ -622,14 +622,14 @@ export const UploadPage = () => {
         }
 
         .file-drop-zone {
-          border: 2px dashed rgba(255, 255, 255, 0.15);
+          border: 2px dashed var(--border);
           border-radius: var(--radius-md);
-          background: rgba(15, 23, 42, 0.5);
+          background: var(--surface);
           transition: border-color 0.2s, background-color 0.2s;
         }
         .file-drop-zone:hover {
-          border-color: var(--primary);
-          background: rgba(99, 102, 241, 0.05);
+          border-color: var(--gold);
+          background: var(--surface-2);
         }
 
         .file-drop-label {
@@ -642,20 +642,20 @@ export const UploadPage = () => {
         }
 
         .error-banner {
-          background: rgba(244, 63, 94, 0.12);
-          border: 1px solid rgba(244, 63, 94, 0.3);
-          border-radius: var(--radius-md);
+          background: var(--danger-bg);
+          border: 1px solid var(--danger);
+          border-radius: var(--radius-sm);
           padding: 1rem 1.25rem;
         }
 
         .warning-card {
-          background: rgba(245, 158, 11, 0.08);
-          border-color: rgba(245, 158, 11, 0.3);
+          background: var(--amber-bg);
+          border-color: var(--gold-border);
         }
 
         .success-card {
-          background: rgba(16, 185, 129, 0.08);
-          border-color: rgba(16, 185, 129, 0.3);
+          background: rgba(79, 214, 160, 0.08);
+          border-color: rgba(79, 214, 160, 0.3);
           padding: 2rem;
         }
 
@@ -663,7 +663,7 @@ export const UploadPage = () => {
           width: 54px;
           height: 54px;
           border-radius: 50%;
-          background: rgba(16, 185, 129, 0.15);
+          background: rgba(79, 214, 160, 0.15);
           display: flex;
           align-items: center;
           justify-content: center;
@@ -676,34 +676,35 @@ export const UploadPage = () => {
         }
 
         .stat-box {
-          background: rgba(15, 23, 42, 0.6);
-          border: 1px solid var(--border-color);
-          border-radius: var(--radius-md);
+          background: var(--surface-2);
+          border: 1px solid var(--border);
+          border-radius: var(--radius-sm);
           padding: 1rem 1.25rem;
           display: flex;
           flex-direction: column;
           gap: 0.25rem;
         }
         .stat-label {
-          font-size: 0.75rem;
+          font-family: var(--font-mono);
+          font-size: 0.72rem;
           font-weight: 600;
           color: var(--text-muted);
           text-transform: uppercase;
-          letter-spacing: 0.05em;
+          letter-spacing: 0.1em;
         }
         .stat-val {
-          font-family: var(--font-heading);
+          font-family: var(--font-mono);
           font-size: 1.75rem;
           font-weight: 800;
-          color: var(--text-main);
+          color: var(--text-bright);
         }
-        .stat-saved .stat-val { color: #34d399; }
-        .stat-duplicates .stat-val { color: #fbbf24; }
-        .stat-rejected .stat-val { color: #f87171; }
+        .stat-saved .stat-val { color: var(--green); }
+        .stat-duplicates .stat-val { color: var(--gold-light); }
+        .stat-rejected .stat-val { color: var(--danger); }
 
         .mapping-item {
-          background: rgba(15, 23, 42, 0.6);
-          border: 1px solid var(--border-color);
+          background: var(--surface-2);
+          border: 1px solid var(--border);
           border-radius: var(--radius-sm);
           padding: 0.75rem;
         }
