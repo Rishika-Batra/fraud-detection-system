@@ -17,6 +17,7 @@ SentinelGuard is an enterprise fraud detection and case investigation platform. 
   - [3. Frontend Setup](#3-frontend-setup)
 - [Demo Accounts & RBAC](#demo-accounts--rbac)
 - [Running Tests & Quality Assurance](#running-tests--quality-assurance)
+- [Deployment](#deployment)
 - [Documentation Directory](#documentation-directory)
 
 ---
@@ -276,6 +277,57 @@ A dedicated **Upload Data** page is available at `/upload` within the client app
 - **Interactive Column Mapping:** If required canonical columns are missing, an interactive mapping panel lets users map unrecognised headers to standard fields (`account_id`, `amount`, `currency`, `merchant`, `transaction_type`, `region`, `timestamp`) and re-run validation.
 - **Controlled Ingestion:** The **Import valid rows** action is enabled only when valid rows exist. Upon successful import, a batch summary displays saved, rejected, and duplicate totals with the batch ID and a direct link to the Dashboard filtered by `source=uploaded`.
 - **Source Filtering:** The Dashboard transactions table includes a Source filter (`All`, `Demo`, `Uploaded`) and an "Uploaded" badge for ingested batches.
+
+---
+
+## Deployment
+
+SentinelGuard can be deployed as a **single web service** — the Express server serves both the API and the built React client.
+
+### Build
+
+```bash
+cd client && npm ci && npm run build && cd ../server && npm ci
+```
+
+### Start
+
+```bash
+cd server && npm start
+```
+
+### Required Environment Variables
+
+| Variable | Required | Description |
+| :--- | :--- | :--- |
+| `NODE_ENV` | Yes | Set to `production` for deployment |
+| `JWT_SECRET` | Yes | Strong random string, **≥ 32 characters**. Generate with: `node -e "console.log(require('crypto').randomBytes(48).toString('base64'))"` |
+| `DB_PATH` | No | Path to SQLite file (default: `./db/fraud.db`). Use an absolute path in production. |
+| `PORT` | No | Server port (default: `5001`) |
+| `ALLOW_DEMO_SEED` | No | Set to `true` to auto-seed demo data on first start when the database is empty |
+| `SEED_PASSWORD` | If demo | Password for all demo accounts (≥ 12 characters). Never logged. |
+| `CLIENT_DIST_PATH` | No | Override the built client folder (default: `../client/dist`) |
+
+### How Demo Bootstrap Works
+
+When `ALLOW_DEMO_SEED=true`, `SEED_PASSWORD` is set (≥ 12 chars), and the users table is empty, the server automatically seeds ~300 transactions, 25 cases, and 6 demo users at startup. If users already exist, seeding is skipped — so a restart never duplicates data.
+
+> **⚠️ Free-tier hosting note:** Many free hosting platforms (Render, Railway, etc.) use ephemeral storage — the SQLite database file is deleted on every restart or redeploy. With `ALLOW_DEMO_SEED=true`, the server will automatically re-seed itself on each cold start, so the demo remains functional.
+
+> **🔒 Data safety warning:** Do **not** upload real or personal financial data to a public demo instance. The demo database is not encrypted, may be wiped at any time, and is accessible to anyone with the demo credentials.
+
+### Example: Render / Railway
+
+Set these environment variables in your hosting dashboard:
+
+```text
+NODE_ENV=production
+JWT_SECRET=<your-64-char-random-string>
+ALLOW_DEMO_SEED=true
+SEED_PASSWORD=<your-12+-char-password>
+```
+
+Set the **build command** to `cd client && npm ci && npm run build && cd ../server && npm ci` and the **start command** to `cd server && npm start`.
 
 ---
 
